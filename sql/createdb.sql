@@ -18,7 +18,7 @@ CREATE TABLE `sport` (
 CREATE TABLE `athlete` (
   `athleteId` varchar(7) NOT NULL,
   `athleteName` varchar(25) NOT NULL,
-  'surname' varchar(25) DEFAULT NULL,
+  `familyName` varchar(25) DEFAULT NULL,
   `birthdate` varchar(10) NOT NULL,
   `countryId` varchar(3) NOT NULL,
   `sportId` varchar(7) DEFAULT NULL,
@@ -31,19 +31,19 @@ CREATE TABLE `athlete` (
   `nickname` varchar(200) DEFAULT NULL,
   `language` varchar(200) DEFAULT NULL,
   `hobbies` varchar(200) DEFAULT NULL,
-  'photo' blob, 
+  `photo` blob, 
   PRIMARY KEY (`athleteId`,`countryId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE `athleteHighlight` (
   `athleteId` varchar(7) NOT NULL,
-  `eventName` varchar(50) NOT NULL,
+  `league` varchar(50) NOT NULL,
   `rank` varchar(10) NOT NULL,
   `event` varchar(3) NOT NULL,
-  `year` varchar(7) DEFAULT NULL,
-  `location` varchar(30) DEFAULT NULL,
-  PRIMARY KEY (`athleteId`)
+  `year` varchar(7) NOT NULL,
+  `location` varchar(30) NOT NULL,
+  PRIMARY KEY (`league`, `athleteId`, `year`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `athleteSocial` (
