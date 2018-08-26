@@ -153,7 +153,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
     	  	}
 	    	  	
 	    	//Testing the progress bar if it already reaches to its maximum value  
-	    	logger.info("Completed Insert Data to Banco" );
+	    	logger.info("Completed Update Country Table" );
    	    }  
      
 	     /**
@@ -266,13 +266,22 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
         task.addPropertyChangeListener(this);  // task link to this listener
         task.execute();  // run the Task class
     }	
+    
+    private void btnDownloadSportActionPerformed(java.awt.event.ActionEvent evt) {
+    	btnDownloadSports.setEnabled(false);
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
+        task = new Task(this.DOWNLOAD_SPORTS);  // The task type is DOWNLOAD TO DATABASE
+        task.addPropertyChangeListener(this);  // task link to this listener
+        task.execute();  // run the Task class
+    }	   
+    
 	
 	/**
 	 * Create the panel.
 	 */
 	private void initComponents() {
 		
-		JLabel lblNewLabel = new JLabel("Download Asian Games Basic Info");
+		JLabel lblNewLabel = new JLabel("Download Asian Games 2018 Basic Info");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setFont(new Font("Times New Roman", Font.PLAIN, 30));
 		
@@ -329,15 +338,21 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		);
 		
 		btnDownloadCountry = new JButton("Download Countries");
+		btnDownloadCountry.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		btnDownloadCountry.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				btnDownloadCountryActionPerformed(arg0);
 			}
 		});
-		btnDownloadCountry.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		
 		btnDownloadSports = new JButton("Download Sports");
 		btnDownloadSports.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnDownloadCountry.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				btnDownloadSportActionPerformed(arg0);
+			}
+		});
+		
 		
 		btnDownloadAthletes = new JButton("Download Athletes");
 		btnDownloadAthletes.setFont(new Font("Tahoma", Font.PLAIN, 15));
@@ -390,23 +405,21 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	}
 	
 	
+	// User can do 3 action download 
     private final int DOWNLOAD_COUNTRY = 1;
     private final int DOWNLOAD_SPORTS = 2;
     private final int DOWNLOAD_ATHLETES = 3;
 	
+
     private static Logger logger = GeneralLogging.getLogger();
-	private Task task;
+	private Task task;  // the inner class is mandatory because ProgressBar run in the background
 	
-	
-	
+	// the property of the elements to be controlled
 	private JPanel panelDownload;
 	private JPanel panelImages;
-	
-	
 	private JButton btnDownloadCountry;
 	private JButton btnDownloadSports;
 	private JButton btnDownloadAthletes;
-	
 	private JProgressBar pbCountries;
 	private JProgressBar pbSports;
 	private JProgressBar pbAthletes;
