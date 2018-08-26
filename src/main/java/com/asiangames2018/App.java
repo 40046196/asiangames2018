@@ -2,6 +2,7 @@ package com.asiangames2018;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,8 +31,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import com.asiangames2018.dao.AsianGamesDAO;
+import com.asiangames2018.download.DownloadAsianGamesInfo;
 import com.asiangames2018.entity.Country;
 import com.asiangames2018.util.GeneralLogging;
+import com.asiangames2018.util.JDialogHelper;
 import com.jaunt.Element;
 import com.jaunt.Elements;
 import com.jaunt.JauntException;
@@ -70,7 +73,7 @@ public class App
 	 * Create and setup the Frame Windows GUI
 	 */
 	protected static  void createGUIMenu() {
-		mainFrame.setTitle("Lotto Quebec Analysis Software ver 1.3.0 - (c) 2018, Lion du Quebec" ); // Prepare a blank frame  
+		mainFrame.setTitle("Asian Games 2018 Statistics - (c) 2018, Lion du Quebec" ); // Prepare a blank frame  
 		javax.swing.JPanel panel = new ImagePanel();
 		mainFrame.add(panel);
 		App app = new App();  
@@ -116,19 +119,19 @@ public class App
 	 * @param evt
 	 */
 	private void downloadAsianGamesBasicDataItemActionPerformed (ActionEvent evt) {
-//		DownloadBancoResultat downloadBanco = new DownloadBancoResultat();		
-//		JDialog dialog = new JDialog(mainFrame ,"Download Banco Resultat", true);  // mainFrame is the modal,
-//
-//		dialog.add(downloadBanco);
-//		dialog.pack();
-//		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();   //  get the default windows size
-//        Dimension dialogSize = dialog.getSize();  //  get your frame size
-//        dialog.setLocation(new Point((screenSize.width  - dialogSize.width) / 2,                        // set the position of the frame
-//               (screenSize.height - dialogSize.height) / 2));                      // to the center of screen
-//		dialog.setDefaultCloseOperation( javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-//		JDialogHelper.setJDialogTree(dialog,  null, null);   //  Dialog student form is first dialog
-//		dialog.setVisible(true);  // When setVisible  this program waiting, until you close the dialog.
-//		dialog.dispose();
+		DownloadAsianGamesInfo downloadAsianGamesInfo = new DownloadAsianGamesInfo();		
+		JDialog dialog = new JDialog(mainFrame ,"Download Asian Games Basic Info", true);  // mainFrame is the modal,
+
+		dialog.add(downloadAsianGamesInfo);
+		dialog.pack();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();   //  get the default windows size
+        Dimension dialogSize = dialog.getSize();  //  get your frame size
+        dialog.setLocation(new Point((screenSize.width  - dialogSize.width) / 2,                        // set the position of the frame
+               (screenSize.height - dialogSize.height) / 2));                      // to the center of screen
+		dialog.setDefaultCloseOperation( javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+		JDialogHelper.setJDialogTree(dialog,  null, null);   //  Dialog student form is first dialog
+		dialog.setVisible(true);  // When setVisible  this program waiting, until you close the dialog.
+		dialog.dispose();
 	}
 
 

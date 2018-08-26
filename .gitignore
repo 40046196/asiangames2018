@@ -14,3 +14,6 @@ buildNumber.properties
 src/main/java/com/asiangames2018/util/LottoUtil.java
 .png
 bin/
+*.txt
+*.lck
+*.jpg
