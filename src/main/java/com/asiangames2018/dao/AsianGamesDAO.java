@@ -70,11 +70,6 @@ public class AsianGamesDAO extends DAOUtil {
 			connection = super.getConnection();  			
 			statement = connection.prepareStatement(sql);      
 			statement.setString(1, country.getCountryId());
-			
-//            File image = new File("C:/honda.jpg");
-//            inputStream = new FileInputStream(image);
-//			 statement.setBinaryStream(2, (InputStream) inputStream, (int)(image.length()));
-			 
 			statement.executeUpdate();
 		} catch (Exception e) {   
 			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );

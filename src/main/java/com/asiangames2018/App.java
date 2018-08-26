@@ -1,5 +1,12 @@
 package com.asiangames2018;
 
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,9 +21,17 @@ import java.sql.Blob;
 import java.sql.SQLException;
 
 import javax.sql.rowset.serial.SerialException;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import com.asiangames2018.dao.AsianGamesDAO;
 import com.asiangames2018.entity.Country;
+import com.asiangames2018.util.GeneralLogging;
 import com.jaunt.Element;
 import com.jaunt.Elements;
 import com.jaunt.JauntException;
@@ -30,76 +45,97 @@ import com.jaunt.util.IOUtil;
  */
 public class App 
 {
-    public static void main( String[] args )
-    {
-    	String flagURL = "https://en.asiangames2018.id/d3images/ml/flags/xl/";
-        System.out.println( "Hello World!g" );
-        AsianGamesDAO dao = new AsianGamesDAO();
-        try{
-      	  UserAgent userAgent = new UserAgent();                       //create new userAgent (headless browser).
-      	  userAgent.settings.checkSSLCerts = false;
-      	  userAgent.visit("https://en.asiangames2018.id/athletes/page/1/");         //visit a url  
- //     	  System.out.println(userAgent.doc.innerHTML());               //print the document as HTML
-      	  
-      	  Elements elements = userAgent.doc.findEvery("<select>"); 
-      	  Elements countryElements = elements.getElement(1).findEvery("<option>");
-      	  
-      	  
-      	  System.out.println(elements.size());
-      	  
-      	  for (Element element : countryElements) {
-      		  String countryTags = element.getAt("value");
-      		  
-      		  String[] split = countryTags.split("/");
-      		  String countryId = split[3];
-      		  if (countryId.length() != 3) continue;   // valid country id only 3 digits
-      		  String countryName = element.getChildText();
+	public static void main(String[] args) {
+		try {
+			GeneralLogging.setup();   // setup the logger file, only call once.
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		//	 UIManager.getDefaults().put( "TitledBorder.font", new javax.swing.plaf.FontUIResource( new Font( "Arial", Font.BOLD, 12 ) ) ) ;
 
-      		  String urlCountryFlag = flagURL + countryId + ".png";
-      		  Blob blob = null; 
-      		  FileInputStream fis = null;
-      		  try {
-          		  URL url = new URL (urlCountryFlag);
-          		  
-      			  byte[] flagBytes =IOUtils.toByteArray(url);
- 				  blob = new javax.sql.rowset.serial.SerialBlob(flagBytes);
+       SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                Font f = new Font("verdana", Font.BOLD, 18);
+                UIManager.put("Menu.font", f);
+                UIManager.put("MenuItem.font", f);
+                UIManager.put("TitledBorder.font", f);
+	                
+                createGUIMenu();
+            }
+        });		
+	}
+	
+	
+	/*
+	 * Create and setup the Frame Windows GUI
+	 */
+	protected static  void createGUIMenu() {
+		mainFrame.setTitle("Lotto Quebec Analysis Software ver 1.3.0 - (c) 2018, Lion du Quebec" ); // Prepare a blank frame  
+		javax.swing.JPanel panel = new ImagePanel();
+		mainFrame.add(panel);
+		App app = new App();  
+		mainFrame.setJMenuBar(app.createMenu());  //  set the menu for this application
 
- 				  File flagFile = new File("image//country//" + countryName + ".png");
- 				  if (!flagFile.getParentFile().isDirectory())  {  // check if directory exist
- 					 flagFile.getParentFile().mkdir();   // make non-existing directory folder
- 				  }
-  				InputStream is = blob.getBinaryStream();
-  				OutputStream os = new FileOutputStream(flagFile);
-  				byte[] buff = blob.getBytes(1,(int)blob.length());
-  				os.write(buff);
-  				os.close();
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();   //  get the default windows size
+		mainFrame.setSize(screenSize.width, screenSize.height);     // Initialize the frame size (width * height);   (x,y) position..
+        Dimension frameSize = mainFrame.getSize();  //  get your frame size as your screen size
+		mainFrame.setVisible(true);
+	}
+	
+	/**
+	 * Set up the menu bar, on the top of the frame..
+	 */
+	public JMenuBar createMenu() {
+		JMenuBar menuBar = new JMenuBar();  // the bar to handle all menus.
+		setFileMenu(menuBar);
+		return menuBar;
+	}	
 
-
-				} catch (SerialException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (FileNotFoundException e) {
-      			  // TODO Auto-generated catch block
-      			  e.printStackTrace();
-      		  } catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	/**
+	 * Display all action under File Menus
+	 * @param menuBar
+	 */
+	private void setFileMenu(JMenuBar menuBar) {
+		// Define the first Menu for Download and Update database tables.
+		JMenu fileMenu = new JMenu("File");   //  First group will handle master file
+		fileMenu.setMnemonic(KeyEvent.VK_F);  //  The shortcut is ALT + F (Master File)	
+		menuBar.add(fileMenu);   //  add to the menu bar
+			/**  The Menu Under File  **/
+		JMenuItem downloadAsianGamesBasicData = new JMenuItem("Download Basic Data", KeyEvent.VK_D);
+		downloadAsianGamesBasicData.setToolTipText("Download Basic Data: Country, Sport, Athletes");
+		downloadAsianGamesBasicData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				downloadAsianGamesBasicDataItemActionPerformed(evt);
 			}
-      		  
-      		  
-      		
-      		  
-      		  
-      		  Country country = new Country(countryId, countryName, blob);
-      		  dao.insertCountry(country);
-      	  }
-      	}
-      	catch(JauntException e){         //if an HTTP/connection error occurs, handle JauntException.
-      	  System.err.println(e);
-      	}        
-        
-    }
+		});		
+		fileMenu.add(downloadAsianGamesBasicData);     
+	}	
+	
+	/**
+	 * download all master tables from asian games websites
+	 * @param evt
+	 */
+	private void downloadAsianGamesBasicDataItemActionPerformed (ActionEvent evt) {
+//		DownloadBancoResultat downloadBanco = new DownloadBancoResultat();		
+//		JDialog dialog = new JDialog(mainFrame ,"Download Banco Resultat", true);  // mainFrame is the modal,
+//
+//		dialog.add(downloadBanco);
+//		dialog.pack();
+//		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();   //  get the default windows size
+//        Dimension dialogSize = dialog.getSize();  //  get your frame size
+//        dialog.setLocation(new Point((screenSize.width  - dialogSize.width) / 2,                        // set the position of the frame
+//               (screenSize.height - dialogSize.height) / 2));                      // to the center of screen
+//		dialog.setDefaultCloseOperation( javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+//		JDialogHelper.setJDialogTree(dialog,  null, null);   //  Dialog student form is first dialog
+//		dialog.setVisible(true);  // When setVisible  this program waiting, until you close the dialog.
+//		dialog.dispose();
+	}
+
+
+   // Variables declaration - do not modify
+	private static BufferedImage image;
+	private static  JFrame mainFrame = new JFrame();
+	protected JDialog parentDialog;
+
+
 }

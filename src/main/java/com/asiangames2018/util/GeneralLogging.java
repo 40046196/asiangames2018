@@ -1,5 +1,6 @@
 package com.asiangames2018.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -31,6 +32,11 @@ public class GeneralLogging {
 		    String strDate = sdf.format(date);
 
 		    logger.setLevel(Level.INFO);
+		    File file = new File("log\\a.txt");
+		    if (!file.getParentFile().exists())  {
+		    	file.mkdirs();
+		    }
+		    
 		    fileTxt = new FileHandler("log\\" + strDate  + ".txt", true);
 		    // Create txt Formatter
 		    formatterTxt = new SimpleFormatter();
