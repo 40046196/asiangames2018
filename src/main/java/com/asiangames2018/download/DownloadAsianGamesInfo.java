@@ -37,6 +37,7 @@ import java.awt.event.ActionEvent;
 import com.asiangames2018.dao.AsianGamesDAO;
 import com.asiangames2018.entity.Country;
 import com.asiangames2018.util.GeneralLogging;
+import com.asiangames2018.util.PanelImage;
 import com.jaunt.Element;
 import com.jaunt.Elements;
 import com.jaunt.JauntException;
@@ -67,6 +68,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    private final int DOWNLOAD_SPORTS = 2;
 	    private final int DOWNLOAD_ATHLETES = 3;
 	    private int option = DOWNLOAD_COUNTRY;
+	    private PanelImage panelImage;
 	    
 	    private String flagURL = "https://en.asiangames2018.id/d3images/ml/flags/xl/";
 		
@@ -75,9 +77,11 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		 *     either Depend on What user click to DOWNLOAD
 		 * @param option
 		 */
-		public Task(int option) {
+		public Task(int option, PanelImage panelImage) {
 			this.option = option;
+			this.panelImage = panelImage;
 		}
+		
 		
 		/*
 		 * Main task. Executed in background thread.
@@ -208,6 +212,11 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	              		  
 	          			byte[] flagBytes =IOUtils.toByteArray(url);
 	          			countryFlag = new javax.sql.rowset.serial.SerialBlob(flagBytes);
+	          			
+	          			panelImage.setImageFile(flagBytes);
+	          			panelImage.revalidate();
+	          			panelImage.repaint();
+
 
 //	     				  File flagFile = new File("image//country//" + countryName + ".png");
 //	     				  if (!flagFile.getParentFile().isDirectory())  {  // check if directory exist
@@ -262,7 +271,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
     private void btnDownloadCountryActionPerformed(java.awt.event.ActionEvent evt) {
     	btnDownloadCountry.setEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
-        task = new Task(this.DOWNLOAD_COUNTRY);  // The task type is DOWNLOAD TO DATABASE
+        task = new Task(this.DOWNLOAD_COUNTRY, this.panelImages);  // The task type is DOWNLOAD TO DATABASE
         task.addPropertyChangeListener(this);  // task link to this listener
         task.execute();  // run the Task class
     }	
@@ -270,7 +279,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
     private void btnDownloadSportActionPerformed(java.awt.event.ActionEvent evt) {
     	btnDownloadSports.setEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
-        task = new Task(this.DOWNLOAD_SPORTS);  // The task type is DOWNLOAD TO DATABASE
+        task = new Task(this.DOWNLOAD_SPORTS, panelImages);  // The task type is DOWNLOAD TO DATABASE
         task.addPropertyChangeListener(this);  // task link to this listener
         task.execute();  // run the Task class
     }	   
@@ -297,7 +306,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		panelDownload = new JPanel();
 		panelDownload.setBorder(new LineBorder(new Color(128, 0, 0), 2, true));
 		
-		panelImages = new JPanel();
+		panelImages = new PanelImage();
 		panelImages.setBackground(new Color(250, 240, 230));
 		panelImages.setForeground(Color.BLUE);
 		panelImages.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Download Images", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
@@ -416,7 +425,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	
 	// the property of the elements to be controlled
 	private JPanel panelDownload;
-	private JPanel panelImages;
+	private PanelImage panelImages;
 	private JButton btnDownloadCountry;
 	private JButton btnDownloadSports;
 	private JButton btnDownloadAthletes;

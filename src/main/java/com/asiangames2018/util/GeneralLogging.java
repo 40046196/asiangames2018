@@ -30,6 +30,8 @@ public class GeneralLogging {
 		    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		    Date date = Calendar.getInstance().getTime();
 		    String strDate = sdf.format(date);
+//		    strDate = LottoUtil.dateManipulation("", 0);
+		
 
 		    logger.setLevel(Level.INFO);
 		    File file = new File("log\\a.txt");
@@ -53,6 +55,14 @@ public class GeneralLogging {
 	  static public Logger getLogger() {
 		  return logger;
 	  }
+	  
+	  /**
+	   * release log
+	   */
+	  static public void close() {
+		  fileTxt.close();
+	  }
+
 	
 	  private static Logger logger;
 	  static private FileHandler fileTxt;
