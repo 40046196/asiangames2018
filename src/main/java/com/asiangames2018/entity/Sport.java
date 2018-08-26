@@ -1,5 +1,7 @@
 package com.asiangames2018.entity;
 
+import java.sql.Blob;
+
 /**
  * Sport entity
  * @author lion
@@ -7,9 +9,10 @@ package com.asiangames2018.entity;
  */
 public class Sport {
 	
-	public Sport(String sportId, String sportName) {
+	public Sport(String sportId, String sportName, Blob sportIcon) {
 		this.sportId = sportId;
 		this.sportName = sportName;
+		this.sportIcon = sportIcon;
 	}
 	public String getSportId() {
 		return sportId;
@@ -23,11 +26,20 @@ public class Sport {
 	public void setSportName(String sportName) {
 		this.sportName = sportName;
 	}
+	public Blob getSportIcon() {
+		return sportIcon;
+	}
+	public void setSportIcon(Blob sportIcon) {
+		this.sportIcon = sportIcon;
+	}
+	
 	@Override
 	public String toString() {
 		return "Sport [sportId=" + sportId + ", sportName=" + sportName + "]";
 	}
 	private String sportId;
 	private String sportName;
+	private Blob sportIcon;
+
 
 }

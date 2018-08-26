@@ -36,6 +36,7 @@ import java.awt.event.ActionEvent;
 
 import com.asiangames2018.dao.AsianGamesDAO;
 import com.asiangames2018.entity.Country;
+import com.asiangames2018.entity.Sport;
 import com.asiangames2018.util.GeneralLogging;
 import com.asiangames2018.util.PanelImage;
 import com.jaunt.Element;
@@ -70,7 +71,10 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    private int option = DOWNLOAD_COUNTRY;
 	    private PanelImage panelImage;
 	    
-	    private String flagURL = "https://en.asiangames2018.id/d3images/ml/flags/xl/";
+	    
+	    //  The format for flag :    [CountryCode].png      Sport : [SportCode].png
+	    private String flagURL = "https://en.asiangames2018.id/d3images/ml/flags/xl/";  // the flag directory
+	    private String sportIconURL = "https://en.asiangames2018.id/d3images/mobile/picto/";  // the sport icon directory
 		
 		/**
 		 * Constructor of Task
@@ -90,15 +94,14 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		 * */
 	     @Override
 	     public Collection doInBackground() {
-
 	    	if (option == DOWNLOAD_COUNTRY) {
 		    	this.colData = downloadAsianGamesCountries();
 	    		updateCountry(colData);
-	    	}
-//	    	} else if (option == DOWNLOAD_SPORTS) {
-//	    		this.colData = downloadAsianGamesSports();
-//	    		updateSports(colData);
-//	    	} else if (option == DOWNLOAD_ATHLETES) {
+	    	} 
+	    	else if (option == DOWNLOAD_SPORTS) {
+	    		this.colData = downloadAsianGamesSports();
+	    	} 
+//	    		else if (option == DOWNLOAD_ATHLETES) {
 //	    		this.colData = downloadAsianGamesAthletes();
 //	    		updateAtheletes(colData);
 //	    	}
@@ -192,7 +195,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	        	  
 	        	Elements elements = userAgent.doc.findEvery("<select>"); 
 	        	Elements countryElements = elements.getElement(1).findEvery("<option>");
-	        	maxSize = countryElements.size();  // the max size 
+	        	maxSize = countryElements.size()  - 1;  // the max size, reduce one for the ALL country option 
 	        	  
 	        	for (Element element : countryElements) {
 	        		String countryTags = element.getAt("value");
@@ -202,11 +205,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	          		if (countryId.length() != 3) continue;   // valid country id only 3 digits
 	          		String countryName = element.getChildText();
 	          		
-	          		System.out.println(countryId + " ** " + countryName);
-
 	          		String urlCountryFlag = flagURL + countryId + ".png";
 	          		Blob countryFlag = null; 
-//	          		  FileInputStream fis = null;
 	          		try {
 	          			URL url = new URL (urlCountryFlag);
 	              		  
@@ -217,32 +217,21 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	          			panelImage.revalidate();
 	          			panelImage.repaint();
 
-
-//	     				  File flagFile = new File("image//country//" + countryName + ".png");
-//	     				  if (!flagFile.getParentFile().isDirectory())  {  // check if directory exist
-//	     					 flagFile.getParentFile().mkdir();   // make non-existing directory folder
-//	     				  }
 	          		} catch (SerialException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
+	          		} finally {
+	          			userAgent.close();
 	          		}
 	          		  
 	          		Country country = new Country(countryId, countryName, countryFlag);
 	          		  
-//	      				InputStream is = blob.getBinaryStream();
-//	      				OutputStream os = new FileOutputStream(flagFile);
-//	      				byte[] buff = blob.getBytes(1,(int)blob.length());
-//	      				os.write(buff);
-//	      				os.close();
-	      				
-		 	   			// add the bancoresult to vector, update progress bar
-	 	   			v.add(country);
+	 	   			v.add(country);  // add the country info to vector then progress the download bar
 	 	   			ctr++;
 	   				setProgress( ctr * 100 / maxSize);
-	   				pbCountries.setString("Downloading "  + ctr*100/maxSize + " %");
-	   				// thread to sleep for 1000 milliseconds
-	   				try {
-		 	   		   Thread.sleep(10);
+	   				pbCountries.setString("Downloading Country Info at "  + ctr*100/maxSize + " %");
+	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
+		 	   		   Thread.sleep(20);
 	 	   			} catch (Exception e) {
 	 	   			  System.out.println(e);
 	 	   			}
@@ -253,14 +242,83 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    	return v;  // return vector<Country>
 	     }
 	     
+	     /**
+	      * Download the Sports (id, name, icon). 
+	      * @return
+	      */
+	     private Collection<Sport> downloadAsianGamesSports() {
+	    	Vector<Sport> v = new Vector<Sport>();
+	    	int ctr = 0;
+	    	int maxSize = 0;
+
+	    	try {
+	    		UserAgent userAgent = new UserAgent();                       //create new userAgent (headless browser).
+	        	userAgent.settings.checkSSLCerts = false;
+	        	userAgent.visit("https://en.asiangames2018.id/athletes/page/1/");         //visit a url  
+	        	  
+	        	Elements elements = userAgent.doc.findEvery("<select>"); 
+	        	Elements sportElements = elements.getElement(0).findEvery("<option>");  // 0 = sport, 1 = country
+	        	maxSize = sportElements.size() -1 ;  // the max size ,  minus 1 for all sport option
+	        	  
+	        	for (Element element : sportElements) {
+	        		String sportTags = element.getAt("value");
+	        		
+	          		  
+	          		String[] split = sportTags.split("/");  // structure from the website
+	          		String sportId = split[3];
+	          		if (sportId.length() != 2) continue;   // valid sport id only 2 digits
+	          		String sportName = element.getChildText();
+
+	          		String urlSportIcon = sportIconURL + sportId + ".png";
+	          		Blob sportIcon = null; 
+//	          		  FileInputStream fis = null;
+	          		try {
+	          			URL url = new URL (urlSportIcon);
+	              		  
+	          			byte[] iconBytes =IOUtils.toByteArray(url);
+	          			sportIcon = new javax.sql.rowset.serial.SerialBlob(iconBytes);
+	          			
+	          			panelImage.setImageFile(iconBytes);
+	          			panelImage.revalidate();
+	          			panelImage.repaint();
+	          		} catch (SerialException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+	          		} finally {
+	          			userAgent.close();
+	          		}
+	          		  
+	          		Sport sport = new Sport(sportId, sportName, sportIcon);
+	          		  
+	 	   			v.add(sport);  // add the country info to vector then progress the download bar
+	 	   			ctr++;
+	   				setProgress( ctr * 100 / maxSize);
+	   				pbSports.setString("Downloading Sport Info at "  + ctr*100/maxSize + " %");
+	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
+		 	   		   Thread.sleep(20);
+	 	   			} catch (Exception e) {
+	 	   			  System.out.println(e);
+	 	   			}
+	        	}
+	    	} catch (Exception ex) {
+	    		
+	    	}
+	    	return v;  // return vector<Country>
+	     }
+	     
+	     
 	}	// end of inner class	
 	
 	
 	public void propertyChange(PropertyChangeEvent evt) {
+		
 	       if ("progress" == evt.getPropertyName()) {
 	            int progress = (Integer) evt.getNewValue();
-	            
-	            pbCountries.setValue(progress);
+	            if (optionClicked == this.DOWNLOAD_COUNTRY) {
+	            	pbCountries.setValue(progress);
+	            } else if (optionClicked == this.DOWNLOAD_SPORTS) {
+	            	pbSports.setValue(progress);
+	            }
 	        } 
 	}
 
@@ -269,6 +327,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	}	
 	
     private void btnDownloadCountryActionPerformed(java.awt.event.ActionEvent evt) {
+    	this.optionClicked = DOWNLOAD_COUNTRY;
     	btnDownloadCountry.setEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
         task = new Task(this.DOWNLOAD_COUNTRY, this.panelImages);  // The task type is DOWNLOAD TO DATABASE
@@ -277,6 +336,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
     }	
     
     private void btnDownloadSportActionPerformed(java.awt.event.ActionEvent evt) {
+    	this.optionClicked = DOWNLOAD_SPORTS;
     	btnDownloadSports.setEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
         task = new Task(this.DOWNLOAD_SPORTS, panelImages);  // The task type is DOWNLOAD TO DATABASE
@@ -312,21 +372,20 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		panelImages.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Download Images", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		GroupLayout groupLayout = new GroupLayout(this);
 		groupLayout.setHorizontalGroup(
-			groupLayout.createParallelGroup(Alignment.TRAILING)
+			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
 					.addContainerGap(58, Short.MAX_VALUE)
 					.addComponent(lblThereIsNo, GroupLayout.PREFERRED_SIZE, 703, GroupLayout.PREFERRED_SIZE)
 					.addContainerGap())
-				.addGroup(Alignment.LEADING, groupLayout.createSequentialGroup()
+				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(58)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+						.addComponent(panelImages, GroupLayout.PREFERRED_SIZE, 591, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 703, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblBasicData, GroupLayout.PREFERRED_SIZE, 703, GroupLayout.PREFERRED_SIZE)
-						.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
-							.addComponent(panelImages, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-							.addComponent(panelDownload, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 647, Short.MAX_VALUE))
+						.addComponent(panelDownload, GroupLayout.PREFERRED_SIZE, 647, GroupLayout.PREFERRED_SIZE)
 						.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 617, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap())
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -342,8 +401,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 					.addGap(29)
 					.addComponent(panelDownload, GroupLayout.PREFERRED_SIZE, 260, GroupLayout.PREFERRED_SIZE)
 					.addGap(45)
-					.addComponent(panelImages, GroupLayout.PREFERRED_SIZE, 141, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(31, Short.MAX_VALUE))
+					.addComponent(panelImages, GroupLayout.PREFERRED_SIZE, 409, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(33, Short.MAX_VALUE))
 		);
 		
 		btnDownloadCountry = new JButton("Download Countries");
@@ -356,11 +415,12 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		
 		btnDownloadSports = new JButton("Download Sports");
 		btnDownloadSports.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		btnDownloadCountry.addActionListener(new ActionListener() {
+		btnDownloadSports.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				btnDownloadSportActionPerformed(arg0);
 			}
 		});
+
 		
 		
 		btnDownloadAthletes = new JButton("Download Athletes");
@@ -371,8 +431,14 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		pbCountries.setStringPainted(true);
 		
 		pbSports = new JProgressBar();
+		pbSports.setValue(0);
+		pbSports.setStringPainted(true);
+
 		
 		pbAthletes = new JProgressBar();
+		pbAthletes.setValue(0);
+		pbAthletes.setStringPainted(true);
+		
 		GroupLayout gl_panelDownload = new GroupLayout(panelDownload);
 		gl_panelDownload.setHorizontalGroup(
 			gl_panelDownload.createParallelGroup(Alignment.LEADING)
@@ -419,7 +485,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
     private final int DOWNLOAD_SPORTS = 2;
     private final int DOWNLOAD_ATHLETES = 3;
 	
-
+    private int optionClicked = 1;
+    
     private static Logger logger = GeneralLogging.getLogger();
 	private Task task;  // the inner class is mandatory because ProgressBar run in the background
 	
