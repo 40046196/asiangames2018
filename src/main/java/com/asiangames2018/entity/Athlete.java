@@ -14,6 +14,19 @@ public class Athlete {
 		
 	}
 	
+	public Athlete(String athleteId,String athleteName, String familyName, String birthdate, String countryId,
+			String sportId, int height, int weight) {
+		this.athleteId = athleteId;
+		this.athleteName = athleteName;
+		this.familyName = familyName;
+		this.birthdate = birthdate;
+		this.countryId = countryId;
+		this.sportId = sportId;
+		this.height = height;
+		this.weight = weight;
+		
+	}
+	
 	public Athlete(String athleteId, String athleteName, String familyName, String birthdate, String countryId,
 			String sportId, int height, int weight, String beginning, String coach, String memorable, String influence,
 			String nickname, String language, String hobbies, Blob photo) {

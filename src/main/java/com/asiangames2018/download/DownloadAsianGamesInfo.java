@@ -329,74 +329,143 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	      */
 	     private Collection<Athlete> downloadAsianGamesAthletes() {
 	    	Vector<Athlete> v = new Vector<Athlete>();
+	    	String noPhotoURL = "https://en.asiangames2018.id//d3images/ml/athletes/silhouette/or-athlete__silhouette--gM.svg";
+	    	
 	    	int ctr = 0;
 	    	int maxSize = 0;
-	    	int maxWebPage = 1;
+	    	int maxWebPage = 150;
 	    	int currentWebPage = 1;
+	    	
+    		UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
+        	userAgent.settings.checkSSLCerts = false;
 
-	    	try {
-	    		UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
-	        	userAgent.settings.checkSSLCerts = false;
-	        	
-	        	while (currentWebPage <= maxWebPage) {
-		        	userAgent.visit("https://en.asiangames2018.id/athletes/page/" + currentWebPage + "/");         //visit a url  
-		        	Elements elements = userAgent.doc.findEvery("<a class='or-athletes__link'>"); 
-		        	for (Element element : elements) {
-		        		String detailInfo = element.getAt("href");  // get athlete detail page
-		        	}
-		        	currentWebPage++;
-	        		
-	        	}
+	    	Collection<String> colDetailURL = listAthleteDetailURL();
+	    	maxSize = colDetailURL.size();
+	    	Iterator<String> it = colDetailURL.iterator();
+	    	while (it.hasNext()) {
+	    		String url = it.next();
+	    		try {
+		    		userAgent.visit(url);
+		    		Element profile = userAgent.doc.findFirst("<div class='or-athlete-profile'>");  // get the profile div
+		    		Elements elementId = profile.findEvery("<img>");
 
-	        	  
-//	        	
-//	        	maxSize = countryElements.size()  - 1;  // the max size, reduce one for Choose A Country option 
-//	        	  
-//	        	for (Element element : countryElements) {
-//	        		String countryTags = element.getAt("value");
-//	          		  
-//	          		String[] split = countryTags.split("/");
-//	          		String countryId = split[3];
-//	          		if (countryId.length() != 3) continue;   // valid country id only 3 digits
-//	          		String countryName = element.getChildText();
-//	          		
-//	          		String urlCountryFlag = flagURL + countryId + ".png";
-//	          		Blob countryFlag = null; 
-//	          		try {
-//	          			URL url = new URL (urlCountryFlag);
-//	              		  
-//	          			byte[] flagBytes =IOUtils.toByteArray(url);
-//	          			countryFlag = new javax.sql.rowset.serial.SerialBlob(flagBytes);
-//	          			
-//	          			panelImage.setImageFile(flagBytes);
-//	          			panelImage.revalidate();
-//	          			panelImage.repaint();
-//
-//	          		} catch (SerialException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//	          		} finally {
-//	          			userAgent.close();
-//	          		}
-//	          		  
-//	          		Country country = new Country(countryId, countryName, countryFlag);
-//	          		  
-//	 	   			v.add(country);  // add the country info to vector then progress the download bar
-//	 	   			ctr++;
-//	   				setProgress( ctr * 100 / maxSize);
-//	   				pbCountries.setString("Downloading Country Info at "  + ctr*100/maxSize + " %");
-//	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
-//		 	   		   Thread.sleep(100);
-//	 	   			} catch (Exception e) {
-//	 	   			  System.out.println(e);
-//	 	   			}
-//	        	}
-	    	} catch (Exception ex) {
+		    		
+		    		
+		    		System.out.println("Leo 2" + elementId.size());
+		    		
+		    		String urlPhoto = elementId.getElement(0).getAt("src");
+		    		System.out.println("Leo 3");
+		    		String athleteId = urlPhoto.substring(urlPhoto.length() -11, urlPhoto.length() -4);
+		    		
+		    		System.out.println("leo 4" + athleteId + " ** " + urlPhoto);
+		    		
+		    	
+		    		
+		    		String athleteName = profile.findFirst("<span class='or-athlete-profile__name--name'>").getChildText();
+		    		String familyName = profile.findFirst("<span class='or-athlete-profile__name--surname'>").getChildText();
+		    		
+		    		System.out.println("leo 5" + athleteName + " ** " + familyName);
+		    		
+		    		
+		    		String countryId = profile.findFirst("<span class='or-athlete-profile__nationality--noc'>").getChildText();
+		    		String birthDate = profile.findFirst("<span class='or-athlete__birth--date'>").getChildText();
+		    		
+		    		Elements heightWeight = profile.findEach("<div class='or-anagraphic__data'>");
+		    		String heightInCm  = heightWeight.getElement(2).getChildText(); //height 
+		    		
+		    		System.out.println("LEo 5a");
+		    		String[] heightString = heightInCm.split("/");
+		    		int height = 0;
+		    		try {
+		    			Integer.parseInt(heightString[0].trim());
+		    		} catch (Exception ex) {
+		    			height = 0;
+		    		}
+		    		System.out.println("Leo 6 " + height);
+
+		    		String weightInCm  = heightWeight.getElement(3).getChildText();  // weight 
+		    		String[] weightString = weightInCm.split("/");
+		    		int weight = 0;
+		    		try {
+		    			Integer.parseInt(weightString[0].trim());
+		    		} catch (Exception ex) {
+		    			weight = 0;
+		    		}
+		    		
+		    		System.out.println("Leo 7 " + weight);
+		    		
+		    		Element sportTypeElement = profile.findFirst("<div class='or-athlete-profile__sport-img'>");
+		    		String sportContent = sportTypeElement.findFirst("<span>").getAt("class");
+		    		String sportId = sportContent.substring(sportContent.length() - 2).toUpperCase();
+		    	
+	          		Blob photo = null; 
+	          		try {
+	          			URL photoAddress = new URL (urlPhoto);
+	              		  
+	          			byte[] photoBytes =IOUtils.toByteArray(photoAddress);
+	          			photo = new javax.sql.rowset.serial.SerialBlob(photoBytes);
+	          			
+	          			panelImage.setImageFile(photoBytes);
+	          			panelImage.revalidate();
+	          			panelImage.repaint();
+	
+	          		} catch (SerialException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+	          		} finally {
+	          			userAgent.close();
+	          		}
+		    		
+		    		Athlete athlete = new Athlete (athleteId, athleteName, familyName, birthDate, countryId, sportId, height, weight   );
+		    		System.out.println(athlete);
+
+		    		v.add(athlete);
+		 	   		ctr++;
+	   				setProgress( ctr * 100 / maxSize);
+	   				pbAthletes.setString("Downloading Athletes Info at "  + ctr*100/maxSize + " %");
+	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
+		 	   		   Thread.sleep(100);
+	 	   			} catch (Exception e) {
+	 	   			  System.out.println(e);
+	 	   			}
+	    		} catch (Exception ex) {
+	    			ex.printStackTrace();
+	    		}
 	    		
 	    	}
+
 	    	return v;  // return vector<Country>
 	     }	     
 	     
+	     
+	     /**
+	      * Return list of individual athlete detail URL
+	      * @return
+	      */
+	     private Collection<String>  listAthleteDetailURL() {
+	    	Vector v = new Vector();
+	    	int maxWebPage = 1;
+		    int currentWebPage = 1;
+	    	 
+		    try {
+		    	UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
+		       	userAgent.settings.checkSSLCerts = false;
+		        	
+		       	while (currentWebPage <= maxWebPage) {
+			       	userAgent.visit("https://en.asiangames2018.id/athletes/page/" + currentWebPage + "/");         //visit a url  
+			       	Elements elements = userAgent.doc.findEvery("<a class='or-athletes__link'>"); 
+			       	for (Element element : elements) {
+			       		String detailInfo = element.getAt("href");  // get athlete detail page
+			       		v.add(detailInfo);
+			       	}
+			       	
+			       	currentWebPage++;
+		       	}
+		    } catch(JauntException ex) {
+		    	System.out.println(ex.getMessage());
+		    }
+	    	return v;
+	     }
 	     
 	     /**
 	      * Download the Sports (id, name, icon). 
@@ -572,7 +641,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
     	this.optionClicked = DOWNLOAD_ATHLETES;
     	setButtonEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
-        task = new Task(this.DOWNLOAD_ATHLETES, panelImages);  // The task type is DOWNLOAD TO DATABASE
+        task = new Task(this.DOWNLOAD_ATHLETES, this.panelImages);  // The task type is DOWNLOAD TO DATABASE
         task.addPropertyChangeListener(this);  // task link to this listener
         task.execute();  // run the Task class
     }	   
