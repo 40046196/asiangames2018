@@ -104,6 +104,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    	} 
 	    	else if (option == DOWNLOAD_SPORTS) {
 	    		this.colData = downloadAsianGamesSports();
+	    		updateSports(colData);
 	    	} 
 //	    		else if (option == DOWNLOAD_ATHLETES) {
 //	    		this.colData = downloadAsianGamesAthletes();
@@ -172,7 +173,36 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	      * @param col
 	      */
 	     private void updateSports(Collection col) {
-	    	 
+	    	logger.info("Updating countries has  " + col.size() + " records. ");
+		    int progressValue = 0;
+		    int maxDataLength = col.size();  // calculate the size of the downloaded countries
+
+		    Iterator<Sport> it = col.iterator();
+		    		  
+		    // read all and get the image to write to files
+		    while (it.hasNext()) {
+		    	Sport sport = (Sport) it.next();  //  get the country
+		    		
+	    	    try {
+	    	    	dao.insertSport(sport);  // insert to country table
+	    	    } catch (Exception ex) {
+	    	    	ex.printStackTrace();
+	    	    }
+	    	    progressValue++;     //  add the progress bar value
+	   			setProgress( progressValue * 100 / maxDataLength);
+	   			pbSports.setString("Updating Database "  + progressValue*100/maxDataLength + " %");
+	   			// thread to sleep for 1000 milliseconds
+	   	  		try {
+	   	  			//  give some 20 milisecond delay, to make the progress running.  
+	   	  		    // without delay, it is also works, but it will be very very fast, since the data is few (less than 1000).
+		 	   		Thread.sleep(100);  
+		 	   		   
+	 	   		} catch (Exception e) {
+	 	   		  System.out.println(e);
+	 	   		}
+	    	}
+	    	//Testing the progress bar if it already reaches to its maximum value  
+	    	logger.info("Completed Update Sport Table" );	    	 
 	     }
 	     
 	     /**
@@ -277,7 +307,17 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	          		Blob sportIcon = null;   // an empty blob
 	          		String sportImagePage = sportName.replace('/', '-'); // the website using "-" for spaces and "/"
 	          		sportImagePage = sportImagePage.replace(' ', '-');  // now the imagePage url is clean..
+	          		
+	          		// Special correction for few mistakes on the website that doesnt follow the structure
 	          		if (sportImagePage.equals("Artistic-Gymnastics"))  sportImagePage = "Artistic-Gymnastic"; // only 1 sport has inconsistency, maybe their programmer forgot to add the S for the pictures.. :D
+	          		if (sportImagePage.equals("Sepaktakraw")) {
+	          			sportImagePage = "sepak-takraw";
+	          			sportName = "Sepak Takraw";
+	          		}
+	          		if (sportImagePage.equals("Skateboard")) {
+	          			sportImagePage = "skateboarding";
+	          			sportName = "Skateboarding";
+	          		}
 
 	          		Blob sportImage = grabImageMascot(sportImageURL +  sportImagePage , sportName);  // grab the mascot image on the url, using sportName
 	          		

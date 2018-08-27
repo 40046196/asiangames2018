@@ -8,7 +8,9 @@ import java.sql.Blob;
  *
  */
 public class Sport {
-	
+	public Sport() {
+		
+	}
 	public Sport(String sportId, String sportName, Blob sportIcon, Blob sportImage) {
 		this.sportId = sportId;
 		this.sportName = sportName;
