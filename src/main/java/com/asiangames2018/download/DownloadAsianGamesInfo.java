@@ -377,7 +377,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		    		String[] heightString = heightInCm.split("/");
 		    		int height = 0;
 		    		try {
-		    			Integer.parseInt(heightString[0].trim());
+		    			height = Integer.parseInt(heightString[0].trim());
 		    		} catch (Exception ex) {
 		    			height = 0;
 		    		}
@@ -387,7 +387,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		    		String[] weightString = weightInCm.split("/");
 		    		int weight = 0;
 		    		try {
-		    			Integer.parseInt(weightString[0].trim());
+		    			weight = Integer.parseInt(weightString[0].trim());
 		    		} catch (Exception ex) {
 		    			weight = 0;
 		    		}
