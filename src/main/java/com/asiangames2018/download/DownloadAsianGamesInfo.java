@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import java.awt.event.ActionEvent;
 
 import com.asiangames2018.dao.AsianGamesDAO;
+import com.asiangames2018.entity.Athlete;
 import com.asiangames2018.entity.Country;
 import com.asiangames2018.entity.Sport;
 import com.asiangames2018.util.GeneralLogging;
@@ -105,11 +106,10 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    	else if (option == DOWNLOAD_SPORTS) {
 	    		this.colData = downloadAsianGamesSports();
 	    		updateSports(colData);
-	    	} 
-//	    		else if (option == DOWNLOAD_ATHLETES) {
-//	    		this.colData = downloadAsianGamesAthletes();
-//	    		updateAtheletes(colData);
-//	    	}
+	    	} else if (option == DOWNLOAD_ATHLETES) {
+	    		this.colData = downloadAsianGamesAthletes();
+//	    		updateAthletes(colData);
+	    	}
 	    	return colData;
 	     }
 
@@ -166,6 +166,45 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    	  	
 	    	//Testing the progress bar if it already reaches to its maximum value  
 	    	logger.info("Completed Update Country Table" );
+   	    }  
+	     
+	     /**
+	      * Update Athletes to database
+	      * @param col
+	      */
+	     private void updateAthletes(Collection<Athlete> col) {
+	    	logger.info("Updating athletes has  " + col.size() + " records. ");
+	        int progressValue = 0;
+	        int maxDataLength = col.size();  // calculate the size of the downloaded countries
+
+	    	Iterator<Athlete> it = col.iterator();
+	    		  
+	    	// read all and get the image to write to files
+	    	while (it.hasNext()) {
+	    		Athlete athlete = (Athlete) it.next();  //  get the country
+	    		
+    	        try {
+    	        	dao.insertAthlete(athlete);  // insert to country table
+    	        } catch (Exception ex) {
+    	        	ex.printStackTrace();
+    	        }
+    	        progressValue++;     //  add the progress bar value
+   				setProgress( progressValue * 100 / maxDataLength);
+   				pbAthletes.setString("Updating Database "  + progressValue*100/maxDataLength + " %");
+  				 // thread to sleep for 1000 milliseconds
+   	  		    try {
+   	  		//  give some 20 milisecond delay, to make the progress running.  
+   	  		    	// without delay, it is also works, but it will be very very fast, since the data is few (less than 1000).
+	 	   		   Thread.sleep(100);  
+	 	   		   
+ 	   			} catch (Exception e) {
+ 	   			  System.out.println(e);
+ 	   			}
+
+    	  	}
+	    	  	
+	    	//Testing the progress bar if it already reaches to its maximum value  
+	    	logger.info("Completed Update athlete Table" );
    	    }  
      
 	     /**
@@ -277,6 +316,89 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	     }
 	     
 	     /**
+	      * Download all athletes
+	      * There is 150 web pages for all athletes
+	      * The steps :
+	      *    Repeat from 1 to 150   {
+	      *    		1.  Collect all athletes ids from 150 pages.
+	      *    }
+	      *    2.  Visit each detail athlete webpage using their athleted id
+	      *    3. Completed all the Athleted information. 
+	      * 
+	      * @return
+	      */
+	     private Collection<Athlete> downloadAsianGamesAthletes() {
+	    	Vector<Athlete> v = new Vector<Athlete>();
+	    	int ctr = 0;
+	    	int maxSize = 0;
+	    	int maxWebPage = 1;
+	    	int currentWebPage = 1;
+
+	    	try {
+	    		UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
+	        	userAgent.settings.checkSSLCerts = false;
+	        	
+	        	while (currentWebPage <= maxWebPage) {
+		        	userAgent.visit("https://en.asiangames2018.id/athletes/page/" + currentWebPage + "/");         //visit a url  
+		        	Elements elements = userAgent.doc.findEvery("<a class='or-athletes__link'>"); 
+		        	for (Element element : elements) {
+		        		String detailInfo = element.getAt("href");  // get athlete detail page
+		        	}
+		        	currentWebPage++;
+	        		
+	        	}
+
+	        	  
+//	        	
+//	        	maxSize = countryElements.size()  - 1;  // the max size, reduce one for Choose A Country option 
+//	        	  
+//	        	for (Element element : countryElements) {
+//	        		String countryTags = element.getAt("value");
+//	          		  
+//	          		String[] split = countryTags.split("/");
+//	          		String countryId = split[3];
+//	          		if (countryId.length() != 3) continue;   // valid country id only 3 digits
+//	          		String countryName = element.getChildText();
+//	          		
+//	          		String urlCountryFlag = flagURL + countryId + ".png";
+//	          		Blob countryFlag = null; 
+//	          		try {
+//	          			URL url = new URL (urlCountryFlag);
+//	              		  
+//	          			byte[] flagBytes =IOUtils.toByteArray(url);
+//	          			countryFlag = new javax.sql.rowset.serial.SerialBlob(flagBytes);
+//	          			
+//	          			panelImage.setImageFile(flagBytes);
+//	          			panelImage.revalidate();
+//	          			panelImage.repaint();
+//
+//	          		} catch (SerialException e) {
+//						// TODO Auto-generated catch block
+//						e.printStackTrace();
+//	          		} finally {
+//	          			userAgent.close();
+//	          		}
+//	          		  
+//	          		Country country = new Country(countryId, countryName, countryFlag);
+//	          		  
+//	 	   			v.add(country);  // add the country info to vector then progress the download bar
+//	 	   			ctr++;
+//	   				setProgress( ctr * 100 / maxSize);
+//	   				pbCountries.setString("Downloading Country Info at "  + ctr*100/maxSize + " %");
+//	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
+//		 	   		   Thread.sleep(100);
+//	 	   			} catch (Exception e) {
+//	 	   			  System.out.println(e);
+//	 	   			}
+//	        	}
+	    	} catch (Exception ex) {
+	    		
+	    	}
+	    	return v;  // return vector<Country>
+	     }	     
+	     
+	     
+	     /**
 	      * Download the Sports (id, name, icon). 
 	      * @return
 	      */
@@ -354,6 +476,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    	return v;  // return vector<Country>
 	     }
 	     
+	     
+	     
 	     /**
 	      * Grab the Sport Image
 	      * @param urlImagePage
@@ -416,6 +540,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	            	pbCountries.setValue(progress);
 	            } else if (optionClicked == this.DOWNLOAD_SPORTS) {
 	            	pbSports.setValue(progress);
+	            } else if (optionClicked == this.DOWNLOAD_ATHLETES) {
+	            	pbAthletes.setValue(progress);
 	            }
 	        } 
 	}
@@ -438,6 +564,15 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
     	setButtonEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
         task = new Task(this.DOWNLOAD_SPORTS, panelImages);  // The task type is DOWNLOAD TO DATABASE
+        task.addPropertyChangeListener(this);  // task link to this listener
+        task.execute();  // run the Task class
+    }	   
+    
+    private void btnDownloadAthletesActionPerformed(java.awt.event.ActionEvent evt) {
+    	this.optionClicked = DOWNLOAD_ATHLETES;
+    	setButtonEnabled(false);
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
+        task = new Task(this.DOWNLOAD_ATHLETES, panelImages);  // The task type is DOWNLOAD TO DATABASE
         task.addPropertyChangeListener(this);  // task link to this listener
         task.execute();  // run the Task class
     }	   
@@ -532,6 +667,11 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		
 		btnDownloadAthletes = new JButton("Download Athletes");
 		btnDownloadAthletes.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		btnDownloadAthletes.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				btnDownloadAthletesActionPerformed(arg0);
+			}
+		});
 		
 		pbCountries = new JProgressBar();
 		pbCountries.setValue(0);

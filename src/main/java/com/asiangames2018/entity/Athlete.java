@@ -2,7 +2,7 @@ package com.asiangames2018.entity;
 
 import java.util.Collection;
 
-import com.mysql.jdbc.Blob;
+import java.sql.Blob;
 
 /**
  * The entity for athlete data
@@ -10,7 +10,9 @@ import com.mysql.jdbc.Blob;
  *
  */
 public class Athlete {
-	
+	public Athlete() {
+		
+	}
 	
 	public Athlete(String athleteId, String athleteName, String familyName, String birthdate, String countryId,
 			String sportId, int height, int weight, String beginning, String coach, String memorable, String influence,
