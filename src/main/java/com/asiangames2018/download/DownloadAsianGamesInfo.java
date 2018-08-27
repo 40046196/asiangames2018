@@ -26,8 +26,11 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
@@ -75,7 +78,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    //  The format for flag :    [CountryCode].png      Sport : [SportCode].png
 	    private String flagURL = "https://en.asiangames2018.id/d3images/ml/flags/xl/";  // the flag directory
 	    private String sportIconURL = "https://en.asiangames2018.id/d3images/mobile/picto/";  // the sport icon directory
-		
+		private String sportImageURL = "https://en.asiangames2018.id/sport/";  
+	    
 		/**
 		 * Constructor of Task
 		 *     either Depend on What user click to DOWNLOAD
@@ -151,7 +155,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
    	  		    try {
    	  		//  give some 20 milisecond delay, to make the progress running.  
    	  		    	// without delay, it is also works, but it will be very very fast, since the data is few (less than 1000).
-	 	   		   Thread.sleep(20);  
+	 	   		   Thread.sleep(100);  
 	 	   		   
  	   			} catch (Exception e) {
  	   			  System.out.println(e);
@@ -189,13 +193,13 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    	int maxSize = 0;
 
 	    	try {
-	    		UserAgent userAgent = new UserAgent();                       //create new userAgent (headless browser).
+	    		UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
 	        	userAgent.settings.checkSSLCerts = false;
 	        	userAgent.visit("https://en.asiangames2018.id/athletes/page/1/");         //visit a url  
 	        	  
 	        	Elements elements = userAgent.doc.findEvery("<select>"); 
 	        	Elements countryElements = elements.getElement(1).findEvery("<option>");
-	        	maxSize = countryElements.size()  - 1;  // the max size, reduce one for the ALL country option 
+	        	maxSize = countryElements.size()  - 1;  // the max size, reduce one for Choose A Country option 
 	        	  
 	        	for (Element element : countryElements) {
 	        		String countryTags = element.getAt("value");
@@ -231,7 +235,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	   				setProgress( ctr * 100 / maxSize);
 	   				pbCountries.setString("Downloading Country Info at "  + ctr*100/maxSize + " %");
 	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
-		 	   		   Thread.sleep(20);
+		 	   		   Thread.sleep(100);
 	 	   			} catch (Exception e) {
 	 	   			  System.out.println(e);
 	 	   			}
@@ -252,7 +256,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    	int maxSize = 0;
 
 	    	try {
-	    		UserAgent userAgent = new UserAgent();                       //create new userAgent (headless browser).
+	    		UserAgent userAgent = new UserAgent();  //create new userAgent (headless browser).
 	        	userAgent.settings.checkSSLCerts = false;
 	        	userAgent.visit("https://en.asiangames2018.id/athletes/page/1/");         //visit a url  
 	        	  
@@ -266,17 +270,23 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	          		String[] split = sportTags.split("/");  // structure from the website
 	          		String sportId = split[3];
 	          		if (sportId.length() != 2) continue;   // valid sport id only 2 digits
-	          		String sportName = element.getChildText();
+	          		String sportName = element.getChildText();  // get the sport name,  see the html structure
+	          		
 
-	          		String urlSportIcon = sportIconURL + sportId + ".png";
-	          		Blob sportIcon = null; 
+	          		String urlSportIcon = sportIconURL + sportId + ".png"; // since we already check, the icon using sportid.png
+	          		Blob sportIcon = null;   // an empty blob
+	          		String sportImagePage = sportName.replace('/', '-'); // the website using "-" for spaces and "/"
+	          		sportImagePage = sportImagePage.replace(' ', '-');  // now the imagePage url is clean..
+	          		if (sportImagePage.equals("Artistic-Gymnastics"))  sportImagePage = "Artistic-Gymnastic"; // only 1 sport has inconsistency, maybe their programmer forgot to add the S for the pictures.. :D
+
+	          		Blob sportImage = grabImageMascot(sportImageURL +  sportImagePage , sportName);  // grab the mascot image on the url, using sportName
+	          		
 	          		try {
-	          			URL url = new URL (urlSportIcon);
-	              		  
+	          			URL url = new URL (urlSportIcon);  //  get the icon sport
 	          			byte[] iconBytes =IOUtils.toByteArray(url);
 	          			sportIcon = new javax.sql.rowset.serial.SerialBlob(iconBytes);
 	          			
-	          			panelImage.setImageFile(iconBytes);
+	          			panelImage.setImageFile(iconBytes);  // animate the icon on the canvas
 	          			panelImage.revalidate();
 	          			panelImage.repaint();
 	          		} catch (SerialException e) {
@@ -285,14 +295,15 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	          			userAgent.close();
 	          		}
 	          		  
-	          		Sport sport = new Sport(sportId, sportName, sportIcon);
+	          		// here you got the sportId, sportName, icon, and mascotImage
+	          		Sport sport = new Sport(sportId, sportName, sportIcon, sportImage);
 	          		  
 	 	   			v.add(sport);  // add the country info to vector then progress the download bar
 	 	   			ctr++;
 	   				setProgress( ctr * 100 / maxSize);
 	   				pbSports.setString("Downloading Sport Info at "  + ctr*100/maxSize + " %");
 	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
-		 	   		   Thread.sleep(20);
+		 	   		   Thread.sleep(100);
 	 	   			} catch (Exception e) {
 	 	   			  System.out.println(e);
 	 	   			}
@@ -301,6 +312,56 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    		
 	    	}
 	    	return v;  // return vector<Country>
+	     }
+	     
+	     /**
+	      * Grab the Sport Image
+	      * @param urlImagePage
+	      * @return
+	      */
+	     
+	     private Blob grabImageMascot(String urlImagePage, String sportName) {
+	    	 
+	    	 Blob blob = null;
+	    	 UserAgent userAgent = new UserAgent();                       //create new userAgent (headless browser).
+	         userAgent.settings.checkSSLCerts = false;
+	         try {
+	        	userAgent.visit(urlImagePage);   
+	        	System.out.println(urlImagePage);
+	        	 
+	        	Element imgs = userAgent.doc.findFirst("<img alt='"  + sportName +"'>");
+	        	 
+       			URL url = new URL (imgs.getAt("src"));
+        		  
+       			byte[] iconBytes =IOUtils.toByteArray(url);
+       			blob = new javax.sql.rowset.serial.SerialBlob(iconBytes);
+       			
+       			panelImage.setImageFile(iconBytes);
+       			panelImage.revalidate();
+       			panelImage.repaint();
+       			
+   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
+		 	   		   Thread.sleep(100);
+	 	   			} catch (Exception e) {
+	 	   			  System.out.println(e);
+	 	   			}
+       			
+	         } catch (JauntException ex) {
+	        	 
+	         } catch (MalformedURLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SerialException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	    	 return blob;
 	     }
 	     
 	     
@@ -325,7 +386,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	
     private void btnDownloadCountryActionPerformed(java.awt.event.ActionEvent evt) {
     	this.optionClicked = DOWNLOAD_COUNTRY;
-    	btnDownloadCountry.setEnabled(false);
+    	setButtonEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
         task = new Task(this.DOWNLOAD_COUNTRY, this.panelImages);  // The task type is DOWNLOAD TO DATABASE
         task.addPropertyChangeListener(this);  // task link to this listener
@@ -334,12 +395,19 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
     
     private void btnDownloadSportActionPerformed(java.awt.event.ActionEvent evt) {
     	this.optionClicked = DOWNLOAD_SPORTS;
-    	btnDownloadSports.setEnabled(false);
+    	setButtonEnabled(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));  // user must wait.
         task = new Task(this.DOWNLOAD_SPORTS, panelImages);  // The task type is DOWNLOAD TO DATABASE
         task.addPropertyChangeListener(this);  // task link to this listener
         task.execute();  // run the Task class
     }	   
+    
+    private void setButtonEnabled(boolean enabledOrDisabled) {
+    	btnDownloadCountry.setEnabled(enabledOrDisabled);
+    	btnDownloadSports.setEnabled(enabledOrDisabled);
+    	btnDownloadAthletes.setEnabled(enabledOrDisabled);
+    	
+    }
     
 	
 	/**
@@ -371,18 +439,20 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addContainerGap(58, Short.MAX_VALUE)
-					.addComponent(lblThereIsNo, GroupLayout.PREFERRED_SIZE, 703, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap())
-				.addGroup(groupLayout.createSequentialGroup()
 					.addGap(58)
 					.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-						.addComponent(panelImages, GroupLayout.PREFERRED_SIZE, 591, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 703, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblBasicData, GroupLayout.PREFERRED_SIZE, 703, GroupLayout.PREFERRED_SIZE)
-						.addComponent(panelDownload, GroupLayout.PREFERRED_SIZE, 647, GroupLayout.PREFERRED_SIZE)
-						.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 617, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblNewLabel, GroupLayout.PREFERRED_SIZE, 617, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblNewLabel_1, GroupLayout.PREFERRED_SIZE, 651, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblThereIsNo, GroupLayout.PREFERRED_SIZE, 642, GroupLayout.PREFERRED_SIZE)
+								.addComponent(lblBasicData))
+							.addContainerGap(35, Short.MAX_VALUE))
+						.addGroup(groupLayout.createSequentialGroup()
+							.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING, false)
+								.addComponent(panelDownload, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(panelImages, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 651, Short.MAX_VALUE))
+							.addContainerGap())))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
@@ -391,15 +461,15 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 					.addComponent(lblNewLabel)
 					.addGap(26)
 					.addComponent(lblNewLabel_1)
-					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGap(4)
 					.addComponent(lblThereIsNo, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
-					.addGap(16)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblBasicData, GroupLayout.PREFERRED_SIZE, 17, GroupLayout.PREFERRED_SIZE)
-					.addGap(29)
-					.addComponent(panelDownload, GroupLayout.PREFERRED_SIZE, 260, GroupLayout.PREFERRED_SIZE)
-					.addGap(45)
-					.addComponent(panelImages, GroupLayout.PREFERRED_SIZE, 409, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(33, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(panelDownload, GroupLayout.PREFERRED_SIZE, 200, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(panelImages, GroupLayout.PREFERRED_SIZE, 446, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(30, Short.MAX_VALUE))
 		);
 		
 		btnDownloadCountry = new JButton("Download Countries");
@@ -442,34 +512,38 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 				.addGroup(gl_panelDownload.createSequentialGroup()
 					.addGap(20)
 					.addGroup(gl_panelDownload.createParallelGroup(Alignment.LEADING)
-						.addComponent(btnDownloadCountry, GroupLayout.PREFERRED_SIZE, 180, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnDownloadSports, GroupLayout.PREFERRED_SIZE, 180, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnDownloadAthletes, GroupLayout.PREFERRED_SIZE, 180, GroupLayout.PREFERRED_SIZE))
-					.addGap(32)
-					.addGroup(gl_panelDownload.createParallelGroup(Alignment.LEADING)
-						.addComponent(pbAthletes, GroupLayout.PREFERRED_SIZE, 376, GroupLayout.PREFERRED_SIZE)
-						.addComponent(pbSports, GroupLayout.PREFERRED_SIZE, 376, GroupLayout.PREFERRED_SIZE)
-						.addComponent(pbCountries, GroupLayout.PREFERRED_SIZE, 376, GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(18, Short.MAX_VALUE))
+						.addGroup(gl_panelDownload.createSequentialGroup()
+							.addComponent(btnDownloadAthletes, GroupLayout.PREFERRED_SIZE, 180, GroupLayout.PREFERRED_SIZE)
+							.addGap(32)
+							.addComponent(pbAthletes, GroupLayout.PREFERRED_SIZE, 376, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panelDownload.createSequentialGroup()
+							.addComponent(btnDownloadSports, GroupLayout.PREFERRED_SIZE, 180, GroupLayout.PREFERRED_SIZE)
+							.addGap(32)
+							.addComponent(pbSports, GroupLayout.PREFERRED_SIZE, 376, GroupLayout.PREFERRED_SIZE))
+						.addGroup(gl_panelDownload.createSequentialGroup()
+							.addComponent(btnDownloadCountry, GroupLayout.PREFERRED_SIZE, 180, GroupLayout.PREFERRED_SIZE)
+							.addGap(32)
+							.addComponent(pbCountries, GroupLayout.PREFERRED_SIZE, 376, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(35, Short.MAX_VALUE))
 		);
 		gl_panelDownload.setVerticalGroup(
 			gl_panelDownload.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panelDownload.createSequentialGroup()
 					.addGap(25)
-					.addGroup(gl_panelDownload.createParallelGroup(Alignment.TRAILING, false)
-						.addComponent(pbCountries, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-						.addComponent(btnDownloadCountry, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 61, Short.MAX_VALUE))
+					.addGroup(gl_panelDownload.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(btnDownloadCountry, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(pbCountries, GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panelDownload.createParallelGroup(Alignment.LEADING, false)
+						.addComponent(btnDownloadSports, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(pbSports, GroupLayout.PREFERRED_SIZE, 36, GroupLayout.PREFERRED_SIZE))
 					.addPreferredGap(ComponentPlacement.UNRELATED)
 					.addGroup(gl_panelDownload.createParallelGroup(Alignment.LEADING)
+						.addComponent(pbAthletes, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
 						.addGroup(gl_panelDownload.createSequentialGroup()
-							.addComponent(btnDownloadSports, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.UNRELATED)
-							.addComponent(btnDownloadAthletes, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panelDownload.createSequentialGroup()
-							.addComponent(pbSports, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(pbAthletes, GroupLayout.PREFERRED_SIZE, 61, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(17, Short.MAX_VALUE))
+							.addGap(5)
+							.addComponent(btnDownloadAthletes, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+					.addGap(87))
 		);
 		panelDownload.setLayout(gl_panelDownload);
 		setLayout(groupLayout);

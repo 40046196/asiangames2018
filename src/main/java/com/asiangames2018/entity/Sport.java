@@ -9,10 +9,11 @@ import java.sql.Blob;
  */
 public class Sport {
 	
-	public Sport(String sportId, String sportName, Blob sportIcon) {
+	public Sport(String sportId, String sportName, Blob sportIcon, Blob sportImage) {
 		this.sportId = sportId;
 		this.sportName = sportName;
 		this.sportIcon = sportIcon;
+		this.sportImage = sportImage;
 	}
 	public String getSportId() {
 		return sportId;
@@ -32,6 +33,13 @@ public class Sport {
 	public void setSportIcon(Blob sportIcon) {
 		this.sportIcon = sportIcon;
 	}
+	public Blob getSportImage() {
+		return sportImage;
+	}
+	public void setSportImage(Blob sportImage) {
+		this.sportImage = sportImage;
+	}
+	
 	
 	@Override
 	public String toString() {
@@ -40,6 +48,7 @@ public class Sport {
 	private String sportId;
 	private String sportName;
 	private Blob sportIcon;
+	private Blob sportImage;
 
 
 }
