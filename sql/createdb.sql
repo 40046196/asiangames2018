@@ -11,8 +11,10 @@ CREATE TABLE `sport` (
   `sportId` varchar(3) NOT NULL,
   `sportName` varchar(45) DEFAULT NULL,
   `sportIcon` blob,
+  `sportImage` blob,
   PRIMARY KEY (`sportId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `athlete` (

@@ -262,7 +262,6 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	        	  
 	        	for (Element element : sportElements) {
 	        		String sportTags = element.getAt("value");
-	        		
 	          		  
 	          		String[] split = sportTags.split("/");  // structure from the website
 	          		String sportId = split[3];
@@ -271,7 +270,6 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 
 	          		String urlSportIcon = sportIconURL + sportId + ".png";
 	          		Blob sportIcon = null; 
-//	          		  FileInputStream fis = null;
 	          		try {
 	          			URL url = new URL (urlSportIcon);
 	              		  
@@ -282,7 +280,6 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	          			panelImage.revalidate();
 	          			panelImage.repaint();
 	          		} catch (SerialException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 	          		} finally {
 	          			userAgent.close();
