@@ -16,6 +16,8 @@ import javax.swing.JProgressBar;
 import javax.swing.border.TitledBorder;
 
 import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import javax.swing.UIManager;
 import java.awt.Color;
@@ -26,6 +28,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -91,7 +94,30 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 			this.panelImage = panelImage;
 		}
 		
-		
+		/**
+		 * Basically creates country JSON objects for viewing in HTML. 
+		 * @param col
+		 */
+		public void createCountryJSON(Vector<Country> col) {
+		    int i = 0;
+		    JSONArray countryArray = new JSONArray();
+		    for (Iterator<Country> it2 = col.iterator(); it2.hasNext(); i++) {
+			JSONObject countryJSONobj = new JSONObject();
+			Country country2 = it2.next();
+			countryJSONobj.put("id", country2.getCountryId());
+			countryJSONobj.put("name", country2.getCountryName());
+			countryJSONobj.put("flag", flagURL + country2.getCountryId() + ".png");		
+			countryArray.put(countryJSONobj);
+		    }
+		    try (FileWriter file = new FileWriter("html\\country.json")) {
+			file.write("data ='" + countryArray.toString() + "'");
+			System.out.println("Successfully Copied JSON Object to File...");
+		    } catch (IOException e) {
+			e.printStackTrace();
+		    }
+		}
+
+	
 		/*
 		 * Main task. Executed in background thread.
 		 * It will download from Asian Games 2018 official website.
