@@ -1,4 +1,4 @@
-package asiangames2018;
+package java.com.asiangames2018;
 
 import static org.junit.Assert.*;
 
