@@ -22,10 +22,10 @@ public class TestConnection extends DAOUtil {
 	try {
 	    // check if connection to MySQL DB is valid under 5 seconds
 	    // try using invalid user name or password in dao.properties 
-	    // this test will fail as a result
+	    // this test will fail as a result 
 	    assertEquals(true, connection.isValid(5));
 	} catch (SQLException e) {
-	    logger.log(Level.SEVERE, TestConnection.class.getName() + ": invalid connection", e);
+	    logger.log(Level.WARNING, TestConnection.class.getName() + ": invalid connection", e);
 	}
     }
 }
