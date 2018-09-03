@@ -83,6 +83,7 @@ public class App
 		mainFrame.setSize(screenSize.width, screenSize.height);     // Initialize the frame size (width * height);   (x,y) position..
         Dimension frameSize = mainFrame.getSize();  //  get your frame size as your screen size
 		mainFrame.setVisible(true);
+		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	/**
