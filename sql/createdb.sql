@@ -19,45 +19,47 @@ CREATE TABLE `sport` (
 
 CREATE TABLE `athlete` (
   `athleteId` varchar(7) NOT NULL,
-  `athleteName` varchar(50) NOT NULL,
-  `familyName` varchar(50) DEFAULT NULL,
-  `birthdate` varchar(10) NOT NULL,
-  `birthCity` varchar(20) DEFAULT NULL,
-  `birthCountry` varchar(20) DEFAULT NULL,
-  `countryId` varchar(3) NOT NULL,
-  `sportId` varchar(2) DEFAULT NULL,
-  `height` int(3) DEFAULT NULL,
-  `weight` int(3) DEFAULT NULL,
-  `photo` blob,
+  `athleteName` varchar(100) DEFAULT NULL,
+  `familyName` varchar(100) DEFAULT NULL,
+  `birthdate` varchar(10) DEFAULT NULL,
+  `birthCity` varchar(100) DEFAULT NULL,
+  `birthCountry` varchar(100) DEFAULT NULL,
+  `countryId` varchar(3) DEFAULT NULL,
+  `sportId` varchar(7) DEFAULT NULL,
+  `height` int(3) DEFAULT '0',
+  `weight` int(3) DEFAULT '0',
+  `photo` mediumblob,
   PRIMARY KEY (`athleteId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 
 CREATE TABLE `athletebiography` (
   `athleteId` varchar(7) NOT NULL,
-  `beginning` varchar(200) DEFAULT NULL,
-  `debut` varchar(200) DEFAULT NULL,
-  `reason` varchar(300) DEFAULT NULL,
-  `coach` varchar(200) DEFAULT NULL,
-  `training` varchar(200) DEFAULT NULL,
-  `ambition` varchar(200) DEFAULT NULL, 
-  `awards` varchar(200) DEFAULT NULL,
-  `hero` varchar(200) DEFAULT NULL,
-  `memorable` varchar(200) DEFAULT NULL,
-  `influence` varchar(200) DEFAULT NULL,
-  `nickname` varchar(200) DEFAULT NULL,
-  `relatives` varchar(200) DEFAULT NULL,
-  `injuries` varchar(200) DEFAULT NULL,
-  `education` varchar(200) DEFAULT NULL,
+  `beginning` varchar(500) DEFAULT NULL,
+  `debut` varchar(500) DEFAULT NULL,
+  `reason` varchar(1000) DEFAULT NULL,
+  `coach` varchar(500) DEFAULT NULL,
+  `training` varchar(500) DEFAULT NULL,
+  `ambition` varchar(500) DEFAULT NULL,
+  `awards` varchar(500) DEFAULT NULL,
+  `hero` varchar(500) DEFAULT NULL,
+  `memorable` varchar(1000) DEFAULT NULL,
+  `influence` varchar(500) DEFAULT NULL,
+  `nickname` varchar(500) DEFAULT NULL,
+  `relatives` varchar(500) DEFAULT NULL,
+  `injuries` varchar(1000) DEFAULT NULL,
+  `education` varchar(500) DEFAULT NULL,
   `language` varchar(200) DEFAULT NULL,
-  `hobbies` varchar(200) DEFAULT NULL,
-  `additionalInformation` varchar(500) DEFAULT NULL,
+  `hobbies` varchar(500) DEFAULT NULL,
+  `additionalInformation` varchar(2000) DEFAULT NULL,
   PRIMARY KEY (`athleteId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 
-CREATE TABLE `athleteHighlight` (
+
+CREATE TABLE `athletehighlight` (
   `athleteId` varchar(7) NOT NULL,
   `league` varchar(100) NOT NULL,
   `rank` varchar(100) NOT NULL,
@@ -65,14 +67,16 @@ CREATE TABLE `athleteHighlight` (
   `year` varchar(25) NOT NULL,
   `location` varchar(100) NOT NULL,
   `result` varchar(3) DEFAULT NULL,
-  PRIMARY KEY (`league`, `athleteId`, `rank`,`event`, `year`, `location`)
+  PRIMARY KEY (`league`,`athleteId`,`rank`,`event`,`year`,`location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE `athleteSocial` (
+
+CREATE TABLE `athletesocial` (
   `athleteId` varchar(7) NOT NULL,
-  `socialmedia` varchar(50) NOT NULL,
-  PRIMARY KEY (`athleteId`, `socialmedia`)
+  `socialmedia` varchar(100) NOT NULL,
+  PRIMARY KEY (`athleteId`,`socialmedia`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 
 CREATE TABLE `athleteMedals` (
   `athleteId` varchar(7) NOT NULL,
