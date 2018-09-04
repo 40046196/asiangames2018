@@ -19,6 +19,7 @@ import com.asiangames2018.entity.Sport;
 import com.asiangames2018.entity.TotalMedals;
 import com.asiangames2018.entity.Athlete;
 import com.asiangames2018.entity.AthleteBiography;
+import com.asiangames2018.entity.AthleteHighlight;
 import com.asiangames2018.entity.AthleteSocial;
 import com.asiangames2018.util.GeneralLogging;
 
@@ -412,6 +413,7 @@ public class AsianGamesDAO extends DAOUtil {
 	    TotalMedals totalMedals = athlete.getMedals();
 	    AthleteBiography biography = athlete.getBio();
 	    Collection socials = biography.getSocialMedia();
+	    Collection colHighlight = biography.getHighlight();
 	    
 	    String sql = "CALL insertAthlete(?,?,?,?,?,?,?,?,?,?,?,"   // athlete  
 	    			+ "?,?,?,"  // totalMedal [gold, silver, bronze 
@@ -491,6 +493,16 @@ public class AsianGamesDAO extends DAOUtil {
 				}
 			}
 			
+			if (colHighlight != null ) {
+				Iterator<AthleteHighlight> it = colHighlight.iterator();
+				while (it.hasNext()) {
+					AthleteHighlight highlight = it.next();
+					this.insertAthleteHighlight(highlight);
+				}
+			}
+			
+			
+			
 			statement.executeUpdate();
 		} catch (Exception e) {   
 			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
@@ -509,6 +521,40 @@ public class AsianGamesDAO extends DAOUtil {
 	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
 	    	}
 		}   	
+	}
+	
+	private void insertAthleteHighlight(AthleteHighlight highlight) {
+		String sql = "INSERT IGNORE INTO athletehighlight values (?,?,?,?,?,?,?)";	
+		Connection connection = null;
+		PreparedStatement statement = null;
+		try     {       
+			connection = super.getConnection();       
+			statement = connection.prepareStatement(sql);
+			statement.setString(1, highlight.getAthleteId());
+			statement.setString(2, highlight.getEventName());
+			statement.setString(3, highlight.getRank());
+			statement.setString(4, highlight.getSportCategory());
+			statement.setString(5, highlight.getYear());
+			statement.setString(6, highlight.getLocation());
+			statement.setString(7, highlight.getBestScoreTime());
+			statement.executeUpdate();
+		} catch (Exception e) {   
+			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
+		} finally {   
+			try {
+				statement.close();   
+			} catch (Exception e) {   
+				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
+				e.printStackTrace();   
+			}
+			
+			try {   
+				connection.close();   
+			} catch (Exception e) {   
+				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
+				e.printStackTrace();   
+			}   
+		}    
 	}
 	
 	

@@ -31,7 +31,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -402,7 +405,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    		String athleteName = profile.findFirst("<span class='or-athlete-profile__name--name'>").getChildText();
 	    		String familyName = profile.findFirst("<span class='or-athlete-profile__name--surname'>").getChildText();
 	    		String countryId = profile.findFirst("<span class='or-athlete-profile__nationality--noc'>").getChildText();
-	    		String birthDate = profile.findFirst("<span class='or-athlete__birth--date'>").getChildText();
+	    		String birthDate = formatDate(profile.findFirst("<span class='or-athlete__birth--date'>").getChildText());
 	    		String birthCity = profile.findFirst("<span class='or-athlete__birth--city'>").getChildText();
 	    		String birthCountry = "";
 	    		try {  // ideally every element use this try catch tags since the tags may not appears when the data incomplete
@@ -528,29 +531,35 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 			        		 } else if (header.equals("Highlights")) {
 			        			 Vector highlightVector = new Vector();
 			        			 String sportEventName = "";
-			        			 Elements trElements = biographyElements.findEvery("<tr>");
-			        			 for (int indexTr=0; indexTr < trElements.size(); indexTr++ ) {
-			        				 if (indexTr==0) continue;   // skip the first one is the header column
-			        				 Elements tdElements = trElements.findEvery("<td>"); // this is the contents
-			        				 if (tdElements.size() == 1) {  // the sport event name
-			        					 sportEventName = tdElements.getElement(0).getChildText(); // sport event ex: Asian Games 2014
-			        				 }  else  {  // this is the prestation, could be more than one row
-				        				 String rank = tdElements.getElement(0).getChildText();  //  the rank at that sport event
-				        				 String sportCategory = tdElements.getElement(1).getChildText(); // sportCategory:  running 100 meters.
-				        				 String year = tdElements.getElement(2).getChildText();  // the year
-				        				 String location = tdElements.getElement(3).getChildText();  // ex: Manila
-				        				 String bestScoreTime = null;  // other than athletic and swimming, no bestScore
-				        				 try {
-				        					 bestScoreTime = tdElements.getElement(4).getChildText();  // ex:   02: 
-				        				 } catch (Exception ex) {
-				        					 System.out.println("No bestScore");
+			        			 System.out.println("Athlet " + athlete.getAthleteName() +  " has highlight ");
+			        			 try {
+				        			 Elements trElements = biographyElements.findFirst("<tbody>").findEvery("<tr>");
+				        			 System.out.println("TR SIZE = " + trElements.size());
+				        			 for (int ii = 0; ii < trElements.size(); ii++) {  // looping for every SportEvent attended
+				        				 Elements tdElements = trElements.getElement(ii).findEach("<td");  
+				        				 if (tdElements.size() == 1) { // if only 1 TD means the header to championships
+				        					 sportEventName = tdElements.getElement(ii).findFirst("<b>").getChildText();
+				        				 } else {   // otherwise is the rank, time , location, etc. [ the details ]
+				        					 
+				        					 String rank = tdElements.getElement(0).getChildText();
+				        					 String event = tdElements.getElement(1).getChildText();
+				        					 String year = tdElements.getElement(2).getChildText();
+				        					 String location = tdElements.getElement(3).getChildText();
+				        					 String result = "";
+				        					 try {
+				        						 result = tdElements.getElement(4).getChildText();
+				        					 } catch (Exception ex) {
+				        						 System.out.println("No result for score");
+				        					 }
+				        					 AthleteHighlight highlight = new AthleteHighlight (athlete.getAthleteId(), sportEventName, rank, event,  year, location, result);	 	
+						        			 highlightVector.add(highlight);
 				        				 }
-					        			 AthleteHighlight highlight = new AthleteHighlight (athlete.getAthleteId(), sportEventName, rank, sportCategory,  year, location, bestScoreTime);	 	
-					        			 highlightVector.add(highlight);
-			        				 }
-			        				 
-			        				 bio.setHighlight(highlightVector);  // get the collection of highlight
-			        			 } 
+				        			 }
+				        		} catch (Exception ex) {
+				        			logger.info(athlete.getAthleteId() + athlete.getAthleteName() +  " has no highlight");
+				        		}
+			        			bio.setHighlight(highlightVector);  // get the collection of highlight
+
 			        		 }	else if (header.equals("Social")) {
 			        			 Vector socMedVector = new Vector();
 			        			 try {
@@ -628,6 +637,20 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    	 return totalMedal;
 	     }
 	     
+	     
+	     private String formatDate(String inDate) {
+	    	 String outDate = "";
+	    	 if (inDate != null) {
+		    	 try {
+		    		 Date date = inSDF.parse(inDate);
+		    	     outDate = outSDF.format(date);
+		    	 } catch (Exception ex)  {
+		    	 	System.out.println("Unable to format date: " + inDate + ex.getMessage());
+		    	    ex.printStackTrace();
+		    	 }
+	    	 }
+	    	 return outDate;
+	     }
 	     
 	     /**
 	      * Return list of individual athlete detail URL
@@ -995,7 +1018,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 
 	}
 	
-	
+	  private SimpleDateFormat inSDF = new SimpleDateFormat("mm/dd/yyyy");
+	  private SimpleDateFormat outSDF = new SimpleDateFormat("yyyy-mm-dd");
 	// User can do 3 action download 
     private final int DOWNLOAD_COUNTRY = 1;
     private final int DOWNLOAD_SPORTS = 2;

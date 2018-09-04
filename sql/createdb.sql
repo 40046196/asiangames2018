@@ -59,12 +59,13 @@ CREATE TABLE `athletebiography` (
 
 CREATE TABLE `athleteHighlight` (
   `athleteId` varchar(7) NOT NULL,
-  `league` varchar(50) NOT NULL,
-  `rank` varchar(10) NOT NULL,
-  `event` varchar(3) NOT NULL,
-  `year` varchar(7) NOT NULL,
-  `location` varchar(30) NOT NULL,
-  PRIMARY KEY (`league`, `athleteId`, `year`)
+  `league` varchar(100) NOT NULL,
+  `rank` varchar(100) NOT NULL,
+  `event` varchar(100) NOT NULL,
+  `year` varchar(25) NOT NULL,
+  `location` varchar(100) NOT NULL,
+  `result` varchar(3) DEFAULT NULL,
+  PRIMARY KEY (`league`, `athleteId`, `rank`,`event`, `year`, `location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE `athleteSocial` (
