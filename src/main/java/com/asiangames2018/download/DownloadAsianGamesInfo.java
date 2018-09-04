@@ -33,14 +33,19 @@ import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.awt.event.ActionEvent;
 
 import com.asiangames2018.dao.AsianGamesDAO;
 import com.asiangames2018.entity.Athlete;
+import com.asiangames2018.entity.AthleteBiography;
+import com.asiangames2018.entity.AthleteHighlight;
+import com.asiangames2018.entity.AthleteSocial;
 import com.asiangames2018.entity.Country;
 import com.asiangames2018.entity.Sport;
+import com.asiangames2018.entity.TotalMedals;
 import com.asiangames2018.util.GeneralLogging;
 import com.asiangames2018.util.PanelImage;
 import com.jaunt.Element;
@@ -108,7 +113,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    		updateSports(colData);
 	    	} else if (option == DOWNLOAD_ATHLETES) {
 	    		this.colData = downloadAsianGamesAthletes();
-//	    		updateAthletes(colData);
+	    		updateAthletes(colData);
 	    	}
 	    	return colData;
 	     }
@@ -323,6 +328,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	      *    		1.  Collect all athletes ids from 150 pages.
 	      *    }
 	      *    2.  Visit each detail athlete webpage using their athleted id
+	      *       a. https://externalmodules.asiangames2018.id/en/25/bio/athletes/bio_3026159.html"
+	      *       b. https://externalmodules.asiangames2018.id/en/25/athletes/3013264/medal.html
 	      *    3. Completed all the Athleted information. 
 	      * 
 	      * @return
@@ -331,111 +338,295 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    	Vector<Athlete> v = new Vector<Athlete>();
 	    	String noPhotoURL = "https://en.asiangames2018.id//d3images/ml/athletes/silhouette/or-athlete__silhouette--gM.svg";
 	    	
-	    	int ctr = 0;
-	    	int maxSize = 0;
-	    	int maxWebPage = 150;
-	    	int currentWebPage = 1;
 	    	
     		UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
         	userAgent.settings.checkSSLCerts = false;
 
-	    	Collection<String> colDetailURL = listAthleteDetailURL();
-	    	maxSize = colDetailURL.size();
+	    	Collection<String> colDetailURL = listAthleteDetailURL();  // list every individual athlete page url
+
+	    	int maxSize = colDetailURL.size();
+	    	int ctr = 0;
 	    	Iterator<String> it = colDetailURL.iterator();
 	    	while (it.hasNext()) {
-	    		String url = it.next();
-	    		try {
-		    		userAgent.visit(url);
-		    		Element profile = userAgent.doc.findFirst("<div class='or-athlete-profile'>");  // get the profile div
-		    		Elements elementId = profile.findEvery("<img>");
-
-		    		
-		    		
-		    		System.out.println("Leo 2" + elementId.size());
-		    		
-		    		String urlPhoto = elementId.getElement(0).getAt("src");
-		    		System.out.println("Leo 3");
-		    		String athleteId = urlPhoto.substring(urlPhoto.length() -11, urlPhoto.length() -4);
-		    		
-		    		System.out.println("leo 4" + athleteId + " ** " + urlPhoto);
-		    		
-		    	
-		    		
-		    		String athleteName = profile.findFirst("<span class='or-athlete-profile__name--name'>").getChildText();
-		    		String familyName = profile.findFirst("<span class='or-athlete-profile__name--surname'>").getChildText();
-		    		
-		    		System.out.println("leo 5" + athleteName + " ** " + familyName);
-		    		
-		    		
-		    		String countryId = profile.findFirst("<span class='or-athlete-profile__nationality--noc'>").getChildText();
-		    		String birthDate = profile.findFirst("<span class='or-athlete__birth--date'>").getChildText();
-		    		
-		    		Elements heightWeight = profile.findEach("<div class='or-anagraphic__data'>");
-		    		String heightInCm  = heightWeight.getElement(2).getChildText(); //height 
-		    		
-		    		System.out.println("LEo 5a");
-		    		String[] heightString = heightInCm.split("/");
-		    		int height = 0;
-		    		try {
-		    			height = Integer.parseInt(heightString[0].trim());
-		    		} catch (Exception ex) {
-		    			height = 0;
-		    		}
-		    		System.out.println("Leo 6 " + height);
-
-		    		String weightInCm  = heightWeight.getElement(3).getChildText();  // weight 
-		    		String[] weightString = weightInCm.split("/");
-		    		int weight = 0;
-		    		try {
-		    			weight = Integer.parseInt(weightString[0].trim());
-		    		} catch (Exception ex) {
-		    			weight = 0;
-		    		}
-		    		
-		    		System.out.println("Leo 7 " + weight);
-		    		
-		    		Element sportTypeElement = profile.findFirst("<div class='or-athlete-profile__sport-img'>");
-		    		String sportContent = sportTypeElement.findFirst("<span>").getAt("class");
-		    		String sportId = sportContent.substring(sportContent.length() - 2).toUpperCase();
-		    	
-	          		Blob photo = null; 
-	          		try {
-	          			URL photoAddress = new URL (urlPhoto);
-	              		  
-	          			byte[] photoBytes =IOUtils.toByteArray(photoAddress);
-	          			photo = new javax.sql.rowset.serial.SerialBlob(photoBytes);
-	          			
-	          			panelImage.setImageFile(photoBytes);
-	          			panelImage.revalidate();
-	          			panelImage.repaint();
-	
-	          		} catch (SerialException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-	          		} finally {
-	          			userAgent.close();
-	          		}
-		    		
-		    		Athlete athlete = new Athlete (athleteId, athleteName, familyName, birthDate, countryId, sportId, height, weight   );
-		    		System.out.println(athlete);
-
-		    		v.add(athlete);
-		 	   		ctr++;
-	   				setProgress( ctr * 100 / maxSize);
-	   				pbAthletes.setString("Downloading Athletes Info at "  + ctr*100/maxSize + " %");
-	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
-		 	   		   Thread.sleep(100);
-	 	   			} catch (Exception e) {
-	 	   			  System.out.println(e);
-	 	   			}
-	    		} catch (Exception ex) {
-	    			ex.printStackTrace();
-	    		}
+	    		String url = it.next();  // an athlete individual url 
+	    		Athlete athlete =  getAthleteProfile(url);  // get basic data
+	    		AthleteBiography bio = getBiography(athlete);
+	    		TotalMedals totalMedals = getTotalMedals(athlete);
+	    		athlete.setBio(bio);
+	    		athlete.setMedals(totalMedals);
 	    		
+	    		System.out.println(athlete);
+	    		
+	    		v.add(athlete);
+	    		
+	 	   		ctr++;
+   				setProgress( ctr * 100 / maxSize);
+   				pbAthletes.setString("Downloading Athletes Info at "  + ctr*100/maxSize + " %");
+   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
+	 	   		   Thread.sleep(100);
+ 	   			} catch (Exception e) {
+ 	   			  System.out.println(e);
+ 	   			}
+
 	    	}
 
 	    	return v;  // return vector<Country>
 	     }	     
+	     
+	     /**
+	      * getAthleteProfile from individual webpage
+	      * https://externalmodules.asiangames2018.id/en/25/bio/athletes/bio_3026159.html
+	      *   using athleteId 
+	      *
+	      * 
+	      * @param url
+	      * @return
+	     * @throws IOException 
+	      */
+	     private Athlete getAthleteProfile(String url)  {
+	    	String noPhotoURL = "https://en.asiangames2018.id//d3images/ml/athletes/silhouette/or-athlete__silhouette--gM.svg";
+		    int ctr = 0;
+		    int maxSize = 0;
+		    int currentWebPage = 1;
+ 	    	Athlete athlete = null;
+	    	 
+ 	    	UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
+        	userAgent.settings.checkSSLCerts = false;
+        	try {
+	    		userAgent.visit(url);  // visit the individual webpage
+	    		Element profile = userAgent.doc.findFirst("<div class='or-athlete-profile'>");  // get the profile div
+	    		Elements elementId = profile.findEvery("<img>");
+
+	    		String urlPhoto = elementId.getElement(0).getAt("src");
+	    		String athleteId = urlPhoto.substring(urlPhoto.length() -11, urlPhoto.length() -4);
+	    		String athleteName = profile.findFirst("<span class='or-athlete-profile__name--name'>").getChildText();
+	    		String familyName = profile.findFirst("<span class='or-athlete-profile__name--surname'>").getChildText();
+	    		String countryId = profile.findFirst("<span class='or-athlete-profile__nationality--noc'>").getChildText();
+	    		String birthDate = profile.findFirst("<span class='or-athlete__birth--date'>").getChildText();
+	    		String birthCity = profile.findFirst("<span class='or-athlete__birth--city'>").getChildText();
+	    		String birthCountry = "";
+	    		try {  // ideally every element use this try catch tags since the tags may not appears when the data incomplete
+	    			profile.findFirst("<span class='or-athlete__birth--country'>").getChildText();
+	    		} catch (JauntException ex) {
+	    			System.out.println (athleteId  + " birthCountry is empty");
+	    		}
+	    		
+	    		Elements heightWeight = profile.findEach("<div class='or-anagraphic__data'>");
+	    		String heightInCm  = heightWeight.getElement(2).getChildText(); //height 
+	    		String[] heightString = heightInCm.split("/");
+	    		int height = 0;
+	    		try {
+	    			height = Integer.parseInt(heightString[0].trim());
+	    		} catch (Exception ex) {
+	    			height = 0;
+	    		}
+
+	    		String weightInCm  = heightWeight.getElement(3).getChildText();  // weight 
+	    		String[] weightString = weightInCm.split("/");
+	    		int weight = 0;
+	    		try {
+	    			weight = Integer.parseInt(weightString[0].trim());
+	    		} catch (Exception ex) {
+	    			weight = 0;
+	    		}
+	    		
+	    		Element sportTypeElement = profile.findFirst("<div class='or-athlete-profile__sport-img'>");
+	    		String sportContent = sportTypeElement.findFirst("<span>").getAt("class");
+	    		String sportId = sportContent.substring(sportContent.length() - 2).toUpperCase();
+	    	
+          		Blob photo = null; 
+  				URL photoAddress = null;
+          		try {
+          			try {
+          				photoAddress = new URL (urlPhoto);
+          			} catch (Exception ex) {
+          				photoAddress = new URL (noPhotoURL);
+          			}
+          			byte[] photoBytes =IOUtils.toByteArray(photoAddress);
+          			photo = new javax.sql.rowset.serial.SerialBlob(photoBytes);
+          			
+          			panelImage.setImageFile(photoBytes);
+          			panelImage.revalidate();
+          			panelImage.repaint();
+
+          		} catch (SerialException e) {
+					e.printStackTrace();
+          		} 
+	    		
+	    		athlete = new Athlete (athleteId, athleteName, familyName, birthDate, birthCity, birthCountry,
+	    				countryId, sportId, height, weight, photo   );
+
+    		} catch (Exception ex) {
+    			ex.printStackTrace();
+    		}
+        	try {
+        		userAgent.close();
+        	} catch (Exception ex) {
+        		
+        	}
+	    	return athlete;
+	     }
+	     
+	     /**
+	      * get the biography of the athlete
+	      * the format : https://externalmodules.asiangames2018.id/en/25/bio/athletes/bio_3026159.html
+	      * @param athlete
+	      * @return
+	      */
+	     private AthleteBiography getBiography(Athlete athlete) {
+		    	AthleteBiography bio = new AthleteBiography();
+		    	String url = "https://externalmodules.asiangames2018.id/en/25/bio/athletes/bio_" + athlete.getAthleteId() + ".html";
+		    	UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
+		    	userAgent.settings.checkSSLCerts = false;
+		        try {
+		        	 userAgent.visit(url);  // visit the individual webpage
+		        	 Elements biographyElements = userAgent.doc.findEvery("<div class='or-article__part markdown'>");
+		        	 
+		        	 // go to this lane if biographyElements exist
+		        	 Elements h2Elements = biographyElements.findEvery("<h2>");
+	        		 Elements contentElements = biographyElements.findEvery("<p>");
+	        		 bio.setAthleteId(athlete.getAthleteId());
+	        		 for (int i=0; i < h2Elements.size(); i++) {
+			        	 try {
+			        		 String header  = h2Elements.getElement(i).getChildText();
+			        		 String content = contentElements.getElement(i).getChildText();
+			        		 
+			        		 if (header.equals("Beginning")) {
+			        			 bio.setBeginning(content);
+			        		 } else if (header.equals("Reason")) {
+			        			 bio.setReason(content);
+			        		 } else if (header.equals("Coach")) {
+			        			 bio.setCoach(content);
+			        		 } else if (header.equals("Training")) {
+			        			 bio.setTraining(content);
+			        		 } else if (header.equals("Debut")) {
+			        			 bio.setDebut(content);
+			        		 }else if (header.equals("Ambition")) {
+			        			 bio.setAmbition(content);
+			        		 } else if (header.equals("Awards")) {
+			        			 bio.setAwards(content);
+			        		 } else if (header.equals("Hero")) {
+			        			 bio.setHero(content);
+			        		 } else if (header.equals("Memorable")) {
+			        			 bio.setMemorable(content);
+			        		 } else if (header.equals("Influence")) {
+			        			 bio.setInfluence(content);
+			        		 }	else if (header.equals("Nickname")) {
+			        			 bio.setNickname(content);
+			        		 }	else if (header.equals("Relatives")) {
+			        			 bio.setRelatives(content);	 
+			        		 }	else if (header.equals("Injuries")) {
+			        			 bio.setInjuries(content);
+			        		 } else if (header.equals("Education")) {
+			        			 bio.setEducation(content);
+			        		 }	else if (header.equals("Languages")) {
+			        			 bio.setLanguage(content);
+			        		 }	else if (header.equals("Hobbies")) {
+			        			 bio.setHobbies(content);
+			        		 }	else if (header.equals("Additional Information")) {
+			        			 bio.setAdditionalInformation(content);
+			        		 } else if (header.equals("Highlights")) {
+			        			 Vector highlightVector = new Vector();
+			        			 String sportEventName = "";
+			        			 Elements trElements = biographyElements.findEvery("<tr>");
+			        			 for (int indexTr=0; indexTr < trElements.size(); indexTr++ ) {
+			        				 if (indexTr==0) continue;   // skip the first one is the header column
+			        				 Elements tdElements = trElements.findEvery("<td>"); // this is the contents
+			        				 if (tdElements.size() == 1) {  // the sport event name
+			        					 sportEventName = tdElements.getElement(0).getChildText(); // sport event ex: Asian Games 2014
+			        				 }  else  {  // this is the prestation, could be more than one row
+				        				 String rank = tdElements.getElement(0).getChildText();  //  the rank at that sport event
+				        				 String sportCategory = tdElements.getElement(1).getChildText(); // sportCategory:  running 100 meters.
+				        				 String year = tdElements.getElement(2).getChildText();  // the year
+				        				 String location = tdElements.getElement(3).getChildText();  // ex: Manila
+				        				 String bestScoreTime = null;  // other than athletic and swimming, no bestScore
+				        				 try {
+				        					 bestScoreTime = tdElements.getElement(4).getChildText();  // ex:   02: 
+				        				 } catch (Exception ex) {
+				        					 System.out.println("No bestScore");
+				        				 }
+					        			 AthleteHighlight highlight = new AthleteHighlight (athlete.getAthleteId(), sportEventName, rank, sportCategory,  year, location, bestScoreTime);	 	
+					        			 highlightVector.add(highlight);
+			        				 }
+			        				 
+			        				 bio.setHighlight(highlightVector);  // get the collection of highlight
+			        			 } 
+			        		 }	else if (header.equals("Social")) {
+			        			 Vector socMedVector = new Vector();
+			        			 try {
+			        				 Elements socialMediaElements = biographyElements.findEvery("<a>");
+			        				 for (int indexSocial = 0; indexSocial < socialMediaElements.size(); indexSocial++) {
+			        					 content = socialMediaElements.getElement(indexSocial).getChildText();
+			        					 AthleteSocial socialMedia = new AthleteSocial(athlete.getAthleteId(), content);
+			        					 socMedVector.add(socialMedia);
+			        				 }
+			        			 }  catch (Exception ex) {
+			        				 logger.info(athlete.getAthleteId() + " has no social media");
+			        			 }
+			        			 bio.setSocialMedia(socMedVector);
+			        			 
+			        		 }	else {			        			 
+			        			logger.info(athlete.getAthleteId() + "HEADER BIOGRAPHY NOT FOUND "  + header);
+			        		 }
+			        	 } catch (Exception ex) {
+			        		 ex.printStackTrace();
+			        	 }
+
+	        			 
+	        		 }
+		        	 
+		        } catch (Exception ex) {
+		        	 logger.info("Athlete " + athlete.getAthleteId()  + " has no biography");
+		        }
+			    	
+		        try {
+		       		userAgent.close();
+		      	} catch (Exception ex) {
+		        		
+		      	}	    	 
+		    	 return bio;	    	 
+	     }
+	     
+	     /**
+	      * get medals won in Asian Games 2018
+	      * 
+	      * The format url : https://externalmodules.asiangames2018.id/en/25/athletes/3013264/medal.html
+	      * Noted that the website is empty if athlete still not winning anything
+	      * so by default the TotalMedal Constructor will return 0/0/0 medals if tags not found
+	      * @param athlete
+	      */
+	     
+	     private TotalMedals getTotalMedals(Athlete athlete) {
+	    	TotalMedals totalMedal = new TotalMedals();
+	    	totalMedal.setAthleteId(athlete.getAthleteId());
+	    	String url = "https://externalmodules.asiangames2018.id/en/25/athletes/" + athlete.getAthleteId() + "/medal.html";
+	    	UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
+	    	userAgent.settings.checkSSLCerts = false;
+	        try {
+	        	 userAgent.visit(url);  // visit the individual webpage
+	        	 Element medals = null; 
+	        	 try {  // ideally for every tags must use try catch, since tags may not there if no data
+	        		 medals = userAgent.doc.findEvery("<td class='or-table-medals__b--medal'>");  // get the profile div
+	        		 String  gold = medals.getElement(0).getChildText();
+	        		 String silver = medals.getElement(1).getChildText();
+	        		 String bronze = medals.getElement(2).getChildText();
+	        		 totalMedal.setGold(Integer.parseInt(gold));
+	        		 totalMedal.setSilver(Integer.parseInt(silver));
+	        		 totalMedal.setBronze(Integer.parseInt(bronze));
+	        	 } catch (JauntException je) {
+		    		 System.out.println(athlete.getAthleteId() +" still not winning any medal");
+	        	 }
+	        } catch (Exception ex) {
+	        	 
+	        }
+		    	
+	        try {
+	       		userAgent.close();
+	      	} catch (Exception ex) {
+	        		
+	      	}	    	 
+	    	 return totalMedal;
+	     }
 	     
 	     
 	     /**
@@ -444,8 +635,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	      */
 	     private Collection<String>  listAthleteDetailURL() {
 	    	Vector v = new Vector();
-	    	int maxWebPage = 1;
-		    int currentWebPage = 1;
+	    	int maxWebPage = 1;  // max is 150
+		    int currentWebPage = 1;  
 	    	 
 		    try {
 		    	UserAgent userAgent = new UserAgent();   //create new userAgent (headless browser).
@@ -460,9 +651,14 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 			       	}
 			       	
 			       	currentWebPage++;
+	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
+	 	 	   		   Thread.sleep(100);
+	  	   			} catch (Exception e) {
+	  	   			  System.out.println(e);
+	  	   			}
 		       	}
 		    } catch(JauntException ex) {
-		    	System.out.println(ex.getMessage());
+		    	logger.info(ex.getMessage());
 		    }
 	    	return v;
 	     }

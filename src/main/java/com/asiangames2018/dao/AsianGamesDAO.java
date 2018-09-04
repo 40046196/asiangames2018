@@ -1,10 +1,14 @@
 package com.asiangames2018.dao;
 
 import com.asiangames2018.util.DAOUtil;
+
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -12,7 +16,10 @@ import java.util.logging.Logger;
 
 import com.asiangames2018.entity.Country;
 import com.asiangames2018.entity.Sport;
+import com.asiangames2018.entity.TotalMedals;
 import com.asiangames2018.entity.Athlete;
+import com.asiangames2018.entity.AthleteBiography;
+import com.asiangames2018.entity.AthleteSocial;
 import com.asiangames2018.util.GeneralLogging;
 
 /**
@@ -388,38 +395,106 @@ public class AsianGamesDAO extends DAOUtil {
 	
 	/*****  ATHLETES TABLES   ***/
 	/**
+	 * Normally when playing with store procedure (SP) the format is :
+	 *  ?  =  PackageAthlete.InsertAthlete(?,?,?,?....); 
+	 *  if  the return value is successful then you can continue with the next procedure
+	 *  or use the return value for your next input in the apps. 
+	 *  
+	 *  In this apps, we just show how to insert into more than one tables at once,
+	 *  SP will handle whether they have to insert or update.. 
+
 	 * Add Athlete Data
 	 * @param Athlete
 	 */
 	public void insertAthlete(Athlete athlete) {
 		Connection connection = null;     
-	    PreparedStatement statement = null;
+	    CallableStatement statement = null;
+	    TotalMedals totalMedals = athlete.getMedals();
+	    AthleteBiography biography = athlete.getBio();
+	    Collection socials = biography.getSocialMedia();
 	    
-	    String sql  = "Insert IGNORE into athlete(athleteId, athleteName, familyName, birthdate, countryId, sportId, "
-	    		+ "height, weight, beginning, coach, memorable, influence, nickname, language, hobbies, photo) "
-	    		+ "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+	    String sql = "CALL insertAthlete(?,?,?,?,?,?,?,?,?,?,?,"   // athlete  
+	    			+ "?,?,?,"  // totalMedal [gold, silver, bronze 
+	    			+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; //biography withouth highlights and socialmedias 
+	    
 		try  {       
-			connection = super.getConnection();  			
-			statement = connection.prepareStatement(sql);      
+			connection = super.getConnection();  		
+//			statement = connection.prepareStatement(sql);      
+		    statement = connection.prepareCall(sql);
+			
+			// athlete main data
 			statement.setString(1, athlete.getAthleteId());
 			statement.setString(2, athlete.getAthleteName());
-			statement.setString(3,  athlete.getFamilyName());
-			statement.setString(4,  athlete.getBirthdate());
-			statement.setString(5,  athlete.getCountryId());
-			statement.setString(6,  athlete.getSportId());
-			statement.setInt(7,  athlete.getHeight());
-			statement.setInt(8,  athlete.getWeight());
-			statement.setString(9,  athlete.getBeginning());
-			statement.setString(10,  athlete.getCoach());
-			statement.setString(11,  athlete.getMemorable());
-			statement.setString(12,  athlete.getInfluence());
-			statement.setString(13,  athlete.getNickname());
-			statement.setString(14,  athlete.getLanguage());
-			statement.setString(15,  athlete.getHobbies());
-			statement.setBlob(16, athlete.getPhoto());
+			statement.setString(3, athlete.getFamilyName());
+			statement.setString(4, athlete.getBirthdate());
+			statement.setString(5, athlete.getBirthCity());
+			statement.setString(6,  athlete.getBirthCountry());
+			statement.setString(7, athlete.getCountryId());
+			statement.setString(8,  athlete.getSportId());
+			statement.setInt(9,  athlete.getHeight());
+			statement.setInt(10, athlete.getWeight());
+			statement.setBlob(11, athlete.getPhoto());
+			
+			// athlete medals
+			statement.setInt(12, totalMedals.getGold());
+			statement.setInt(13, totalMedals.getSilver());
+			statement.setInt(14, totalMedals.getBronze());
+			
+			// athlete biography there are 17 items
+			if (biography!=null) {
+				statement.setString(15, biography.getBeginning());
+				statement.setString(16, biography.getDebut());
+				statement.setString(17, biography.getReason());
+				statement.setString(18, biography.getCoach());
+				statement.setString(19, biography.getTraining());
+				statement.setString(20, biography.getAmbition());
+				statement.setString(21, biography.getAwards());
+				statement.setString(22, biography.getHero());
+				statement.setString(23, biography.getMemorable());
+				statement.setString(24, biography.getInfluence());
+				statement.setString(25, biography.getNickname());
+				statement.setString(26, biography.getRelatives());
+				statement.setString(27, biography.getInjuries());
+				statement.setString(28, biography.getEducation());
+				statement.setString(29, biography.getLanguage());
+				statement.setString(30, biography.getHobbies());
+				statement.setString(31, biography.getAdditionalInformation());
+			} else {
+				statement.setNull(15, java.sql.Types.NULL);
+				statement.setNull(16, java.sql.Types.NULL);
+				statement.setNull(17, java.sql.Types.NULL);
+				statement.setNull(18, java.sql.Types.NULL);
+				statement.setNull(19, java.sql.Types.NULL);
+				statement.setNull(20, java.sql.Types.NULL);
+				statement.setNull(21, java.sql.Types.NULL);
+				statement.setNull(22, java.sql.Types.NULL);
+				statement.setNull(23, java.sql.Types.NULL);
+				statement.setNull(24, java.sql.Types.NULL);
+				statement.setNull(25, java.sql.Types.NULL);
+				statement.setNull(26, java.sql.Types.NULL);
+				statement.setNull(27, java.sql.Types.NULL);
+				statement.setNull(28, java.sql.Types.NULL);
+				statement.setNull(29, java.sql.Types.NULL);
+				statement.setNull(30, java.sql.Types.NULL);
+				statement.setNull(31, java.sql.Types.NULL);
+			}
+			
+			// not comfortable with this type, because you will open more than one connection SQL
+			// if this is transactional avoid this kind of connection.. or database connection could be hang
+			// once too many connection opened and unclosed..  -->  RESET database server..
+			// just fine for this stand alone application..
+			if (socials != null ) {
+				Iterator<AthleteSocial> it = socials.iterator();
+				while (it.hasNext()) {
+					AthleteSocial social = it.next();
+					this.insertAthleteSocialMedia(social);
+				}
+			}
+			
 			statement.executeUpdate();
 		} catch (Exception e) {   
 			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
+			logger.info(athlete.toString());
 		} finally {   
 	    	try {
 	    		if (statement != null) {
@@ -434,6 +509,41 @@ public class AsianGamesDAO extends DAOUtil {
 	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
 	    	}
 		}   	
+	}
+	
+	
+	/**
+	 * insert athlete social media account 
+	 * ex:  fB,  instagram,  telegram, Whatsup, etc..
+	 * @param social
+	 */
+	private void insertAthleteSocialMedia(AthleteSocial social) {
+		String sql = "INSERT IGNORE INTO athletesocial values (?,?)";	
+		Connection connection = null;
+		PreparedStatement statement = null;
+		try     {       
+			connection = super.getConnection();       
+			statement = connection.prepareStatement(sql);
+			statement.setString(1, social.getAthleteId());
+			statement.setString(2, social.getSocialAccount());
+			statement.executeUpdate();
+		} catch (Exception e) {   
+			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
+		} finally {   
+			try {
+				statement.close();   
+			} catch (Exception e) {   
+				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
+				e.printStackTrace();   
+			}
+			
+			try {   
+				connection.close();   
+			} catch (Exception e) {   
+				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
+				e.printStackTrace();   
+			}   
+		}    
 	}
 	
 	/**
@@ -525,18 +635,13 @@ public class AsianGamesDAO extends DAOUtil {
             	athlete.setAthleteName(resultSet.getString(2));
             	athlete.setFamilyName(resultSet.getString(3));
             	athlete.setBirthdate(resultSet.getString(4));
-            	athlete.setCountryId(resultSet.getString(5));
-            	athlete.setSportId(resultSet.getString(6));
-            	athlete.setHeight(resultSet.getInt(7));
-            	athlete.setWeight(resultSet.getInt(8));
-            	athlete.setBeginning(resultSet.getString(9));
-            	athlete.setCoach(resultSet.getString(10));
-            	athlete.setMemorable(resultSet.getString(11));
-            	athlete.setInfluence(resultSet.getString(12));
-            	athlete.setNickname(resultSet.getString(13));
-            	athlete.setLanguage(resultSet.getString(14));
-            	athlete.setHobbies(resultSet.getString(15));
-            	athlete.setPhoto(resultSet.getBlob(16));
+            	athlete.setBirthCity(resultSet.getString(5));
+            	athlete.setBirthCountry(resultSet.getString(6));
+            	athlete.setCountryId(resultSet.getString(7));
+            	athlete.setSportId(resultSet.getString(8));
+            	athlete.setHeight(resultSet.getInt(9));
+            	athlete.setWeight(resultSet.getInt(10));
+            	athlete.setPhoto(resultSet.getBlob(11));
             	v.add(athlete);   
             }   
 		} catch (Exception e) {   
