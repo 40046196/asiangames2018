@@ -203,7 +203,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
    	  		    try {
    	  		//  give some 20 milisecond delay, to make the progress running.  
    	  		    	// without delay, it is also works, but it will be very very fast, since the data is few (less than 1000).
-	 	   		   Thread.sleep(100);  
+	 	   		   Thread.sleep(5);  
 	 	   		   
  	   			} catch (Exception e) {
  	   			  System.out.println(e);
@@ -358,8 +358,6 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	    		athlete.setBio(bio);
 	    		athlete.setMedals(totalMedals);
 	    		
-	    		System.out.println(athlete);
-	    		
 	    		v.add(athlete);
 	    		
 	 	   		ctr++;
@@ -493,6 +491,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 			        	 try {
 			        		 String header  = h2Elements.getElement(i).getChildText();
 			        		 String content = contentElements.getElement(i).getChildText();
+//			        		 content = content.replaceAll("\\s{2,}", " ");
 			        		 
 			        		 if (header.equals("Beginning")) {
 			        			 bio.setBeginning(content);
@@ -531,10 +530,8 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 			        		 } else if (header.equals("Highlights")) {
 			        			 Vector highlightVector = new Vector();
 			        			 String sportEventName = "";
-			        			 System.out.println("Athlet " + athlete.getAthleteName() +  " has highlight ");
 			        			 try {
 				        			 Elements trElements = biographyElements.findFirst("<tbody>").findEvery("<tr>");
-				        			 System.out.println("TR SIZE = " + trElements.size());
 				        			 for (int ii = 0; ii < trElements.size(); ii++) {  // looping for every SportEvent attended
 				        				 Elements tdElements = trElements.getElement(ii).findEach("<td");  
 				        				 if (tdElements.size() == 1) { // if only 1 TD means the header to championships
@@ -658,7 +655,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	      */
 	     private Collection<String>  listAthleteDetailURL() {
 	    	Vector v = new Vector();
-	    	int maxWebPage = 1;  
+	    	int maxWebPage = 5;  
 		    int currentWebPage = 1;  
 	    	 
 		    try {
@@ -675,7 +672,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 			       	
 			       	currentWebPage++;
 	   				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
-	 	 	   		   Thread.sleep(100);
+	 	 	   		   Thread.sleep(20);
 	  	   			} catch (Exception e) {
 	  	   			  System.out.println(e);
 	  	   			}
@@ -779,8 +776,6 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	         userAgent.settings.checkSSLCerts = false;
 	         try {
 	        	userAgent.visit(urlImagePage);   
-	        	System.out.println(urlImagePage);
-	        	 
 	        	Element imgs = userAgent.doc.findFirst("<img alt='"  + sportName +"'>");
 	        	 
        			URL url = new URL (imgs.getAt("src"));

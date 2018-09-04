@@ -22,7 +22,7 @@ CREATE TABLE `athlete` (
   `athleteName` varchar(100) DEFAULT NULL,
   `familyName` varchar(100) DEFAULT NULL,
   `birthdate` varchar(10) DEFAULT NULL,
-  `birthCity` varchar(100) DEFAULT NULL,
+  `birthCity` varchar(150) DEFAULT NULL,
   `birthCountry` varchar(100) DEFAULT NULL,
   `countryId` varchar(3) DEFAULT NULL,
   `sportId` varchar(7) DEFAULT NULL,
@@ -36,23 +36,23 @@ CREATE TABLE `athlete` (
 
 CREATE TABLE `athletebiography` (
   `athleteId` varchar(7) NOT NULL,
-  `beginning` varchar(500) DEFAULT NULL,
-  `debut` varchar(500) DEFAULT NULL,
+  `beginning` varchar(1000) DEFAULT NULL,
+  `debut` varchar(1000) DEFAULT NULL,
   `reason` varchar(1000) DEFAULT NULL,
   `coach` varchar(500) DEFAULT NULL,
-  `training` varchar(500) DEFAULT NULL,
-  `ambition` varchar(500) DEFAULT NULL,
+  `training` varchar(1000) DEFAULT NULL,
+  `ambition` varchar(1000) DEFAULT NULL,
   `awards` varchar(500) DEFAULT NULL,
   `hero` varchar(500) DEFAULT NULL,
   `memorable` varchar(1000) DEFAULT NULL,
-  `influence` varchar(500) DEFAULT NULL,
-  `nickname` varchar(500) DEFAULT NULL,
-  `relatives` varchar(500) DEFAULT NULL,
+  `influence` varchar(1000) DEFAULT NULL,
+  `nickname` varchar(200) DEFAULT NULL,
+  `relatives` varchar(1000) DEFAULT NULL,
   `injuries` varchar(1000) DEFAULT NULL,
   `education` varchar(500) DEFAULT NULL,
   `language` varchar(200) DEFAULT NULL,
   `hobbies` varchar(500) DEFAULT NULL,
-  `additionalInformation` varchar(2000) DEFAULT NULL,
+  `additionalInformation` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`athleteId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -93,11 +93,11 @@ DROP PROCEDURE IF EXISTS insertAthlete$$
 
 CREATE PROCEDURE insertAthlete
 ( IN athleteId varchar(7)
-, IN athleteName VARCHAR(50)
-, IN familyName VARCHAR(50)
+, IN athleteName VARCHAR(100)
+, IN familyName VARCHAR(100)
 , IN birthDate VARCHAR(10)
-, IN birthCity VARCHAR(20)
-, IN birthCountry VARCHAR(20)
+, IN birthCity VARCHAR(100)
+, IN birthCountry VARCHAR(100)
 , IN countryId VARCHAR(3) 
 , IN sportId VARCHAR(2)
 , IN height INT
@@ -106,23 +106,23 @@ CREATE PROCEDURE insertAthlete
 , IN gold INT
 , IN silver INT
 , IN bronze INT
-, IN beginning VARCHAR(200)
-, IN debut VARCHAR(200)
-, IN reason VARCHAR(300)
-, IN coach VARCHAR(200)
-, IN training VARCHAR(200)
-, IN ambition VARCHAR(200)
-, IN awards VARCHAR(200)
-, IN hero VARCHAR(200)
-, IN memorable VARCHAR(200)
-, IN influence VARCHAR(200)
+, IN beginning VARCHAR(1000)
+, IN debut VARCHAR(1000)
+, IN reason VARCHAR(1000)
+, IN coach VARCHAR(500)
+, IN training VARCHAR(1000)
+, IN ambition VARCHAR(1000)
+, IN awards VARCHAR(500)
+, IN hero VARCHAR(500)
+, IN memorable VARCHAR(1000)
+, IN influence VARCHAR(1000)
 , IN nickname VARCHAR(200)
-, IN relatives VARCHAR(200)
-, IN injuries VARCHAR(200)
-, IN education VARCHAR(200)
+, IN relatives VARCHAR(1000)
+, IN injuries VARCHAR(1000)
+, IN education VARCHAR(500)
 , IN language VARCHAR(200)
-, IN hobbies VARCHAR(200)
-, IN additionalInformation VARCHAR(500))
+, IN hobbies VARCHAR(500)
+, IN additionalInformation VARCHAR(1000))
 BEGIN
 
 INSERT IGNORE INTO athlete (
