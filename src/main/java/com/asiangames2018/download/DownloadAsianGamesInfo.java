@@ -366,7 +366,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
    				setProgress( ctr * 100 / maxSize);
    				pbAthletes.setString("Downloading Athletes Info at "  + ctr*100/maxSize + " %");
    				try {  // we animate to be visible to user eyes..  actually not necessary.. just cosmetic here. 
-	 	   		   Thread.sleep(100);
+	 	   		   Thread.sleep(20);
  	   			} catch (Exception e) {
  	   			  System.out.println(e);
  	   			}
@@ -658,7 +658,7 @@ public class DownloadAsianGamesInfo extends JPanel implements ActionListener, Pr
 	      */
 	     private Collection<String>  listAthleteDetailURL() {
 	    	Vector v = new Vector();
-	    	int maxWebPage = 1;  // max is 150
+	    	int maxWebPage = 1;  
 		    int currentWebPage = 1;  
 	    	 
 		    try {
