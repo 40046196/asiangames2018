@@ -507,7 +507,6 @@ public class AsianGamesDAO extends DAOUtil {
 		} catch (Exception e) {   
 			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
 			logger.info("Error for this message " + athlete.toString());
-			logger.info("The length of injuries is = "  + biography.getInjuries().length());
 		} finally {   
 	    	try {
 	    		if (statement != null) {

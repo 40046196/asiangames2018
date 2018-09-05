@@ -42,17 +42,17 @@ CREATE TABLE `athletebiography` (
   `coach` varchar(500) DEFAULT NULL,
   `training` varchar(1000) DEFAULT NULL,
   `ambition` varchar(1000) DEFAULT NULL,
-  `awards` varchar(500) DEFAULT NULL,
+  `awards` varchar(1000) DEFAULT NULL,
   `hero` varchar(500) DEFAULT NULL,
   `memorable` varchar(1000) DEFAULT NULL,
   `influence` varchar(1000) DEFAULT NULL,
   `nickname` varchar(200) DEFAULT NULL,
-  `relatives` varchar(1000) DEFAULT NULL,
+  `relatives` varchar(1500) DEFAULT NULL,
   `injuries` varchar(1000) DEFAULT NULL,
   `education` varchar(500) DEFAULT NULL,
   `language` varchar(200) DEFAULT NULL,
   `hobbies` varchar(500) DEFAULT NULL,
-  `additionalInformation` varchar(1000) DEFAULT NULL,
+  `additionalInformation` mediumtext DEFAULT NULL,
   PRIMARY KEY (`athleteId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -112,17 +112,17 @@ CREATE PROCEDURE insertAthlete
 , IN coach VARCHAR(500)
 , IN training VARCHAR(1000)
 , IN ambition VARCHAR(1000)
-, IN awards VARCHAR(500)
+, IN awards VARCHAR(1000)
 , IN hero VARCHAR(500)
 , IN memorable VARCHAR(1000)
 , IN influence VARCHAR(1000)
 , IN nickname VARCHAR(200)
 , IN relatives VARCHAR(1000)
-, IN injuries VARCHAR(1000)
+, IN injuries VARCHAR(1500)
 , IN education VARCHAR(500)
 , IN language VARCHAR(200)
 , IN hobbies VARCHAR(500)
-, IN additionalInformation VARCHAR(1000))
+, IN additionalInformation mediumtext)
 BEGIN
 
 INSERT IGNORE INTO athlete (
