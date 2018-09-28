@@ -162,44 +162,44 @@ public class AsianGamesDAO extends DAOUtil {
 	}
     }
 	
-	/*
-	 * get all Country List
-	 */
-	public Collection<Country> listAllCountries() {
-		Vector<Country> v = new Vector<Country>();
-		String sql = "SELECT * FROM country ORDER BY countryName";	
-		Connection connection = null;
-		PreparedStatement statement = null;
-		try     {       
-			connection = super.getConnection();       
-			statement = connection.prepareStatement(sql);
-			ResultSet resultSet = statement.executeQuery();   
-             while (resultSet.next()) {   
-            	Country country = new Country();
-            	country.setCountryId(resultSet.getString(1));
-            	country.setCountryName(resultSet.getString(2));
-            	country.setCountryFlag(resultSet.getBlob(3));
-            	v.add(country);   
-            }   
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-			try {
-				statement.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
-				e.printStackTrace();   
-			}
-			
-			try {   
-				connection.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
-				e.printStackTrace();   
-			}   
-		}    
-		return v;
+    /*
+     * get all Country List
+     */
+    public Collection<Country> listAllCountries() {
+	Vector<Country> v = new Vector<Country>();
+	String sql = "SELECT * FROM country ORDER BY countryName";
+	Connection connection = null;
+	PreparedStatement statement = null;
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    ResultSet resultSet = statement.executeQuery();
+	    while (resultSet.next()) {
+		Country country = new Country();
+		country.setCountryId(resultSet.getString(1));
+		country.setCountryName(resultSet.getString(2));
+		country.setCountryFlag(resultSet.getBlob(3));
+		v.add(country);
+	    }
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
+	    try {
+		statement.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close statement !!  ", e);
+		e.printStackTrace();
+	    }
+
+	    try {
+		connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close connectionDB !!  ", e);
+		e.printStackTrace();
+	    }
 	}
+	return v;
+    }
 	
 	/**
 	 * Update Country
@@ -360,45 +360,45 @@ public class AsianGamesDAO extends DAOUtil {
 	}
     }
 	
-	/*
-	 * get all Sport List
-	 */
-	public Collection<Sport> listAllSports() {
-		Vector<Sport> v = new Vector<Sport>();
-		String sql = "SELECT * FROM sport ORDER BY sportName";	
-		Connection connection = null;
-		PreparedStatement statement = null;
-		try     {       
-			connection = super.getConnection();       
-			statement = connection.prepareStatement(sql);
-			ResultSet resultSet = statement.executeQuery();   
-             while (resultSet.next()) {   
-            	Sport sport = new Sport();
-            	sport.setSportId(resultSet.getString(1));
-            	sport.setSportName(resultSet.getString(2));
-            	sport.setSportIcon(resultSet.getBlob(3));
-            	sport.setSportImage(resultSet.getBlob(4));
-            	v.add(sport);   
-            }   
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-			try {
-				statement.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
-				e.printStackTrace();   
-			}
-			
-			try {   
-				connection.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
-				e.printStackTrace();   
-			}   
-		}    
-		return v;
+    /*
+     * get all Sport List
+     */
+    public Collection<Sport> listAllSports() {
+	Vector<Sport> v = new Vector<Sport>();
+	String sql = "SELECT * FROM sport ORDER BY sportName";
+	Connection connection = null;
+	PreparedStatement statement = null;
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    ResultSet resultSet = statement.executeQuery();
+	    while (resultSet.next()) {
+		Sport sport = new Sport();
+		sport.setSportId(resultSet.getString(1));
+		sport.setSportName(resultSet.getString(2));
+		sport.setSportIcon(resultSet.getBlob(3));
+		sport.setSportImage(resultSet.getBlob(4));
+		v.add(sport);
+	    }
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
+	    try {
+		statement.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close statement !!  ", e);
+		e.printStackTrace();
+	    }
+
+	    try {
+		connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close connectionDB !!  ", e);
+		e.printStackTrace();
+	    }
 	}
+	return v;
+    }
 	
 	/**
 	 * Update Sport
@@ -720,52 +720,52 @@ public class AsianGamesDAO extends DAOUtil {
 	}
     }
 	
-	/*
-	 * get all Athlete List
-	 */
-	public Collection<Athlete> listAllAthletes() {
-		Vector<Athlete> v = new Vector<Athlete>();
-		String sql = "SELECT * FROM athlete ORDER BY familyName";	
-		Connection connection = null;
-		PreparedStatement statement = null;
-		try     {       
-			connection = super.getConnection();       
-			statement = connection.prepareStatement(sql);
-			ResultSet resultSet = statement.executeQuery();   
-             while (resultSet.next()) {   
-            	Athlete athlete = new Athlete();
-            	athlete.setAthleteId(resultSet.getString(1));
-            	athlete.setAthleteName(resultSet.getString(2));
-            	athlete.setFamilyName(resultSet.getString(3));
-            	athlete.setBirthdate(resultSet.getString(4));
-            	athlete.setBirthCity(resultSet.getString(5));
-            	athlete.setBirthCountry(resultSet.getString(6));
-            	athlete.setCountryId(resultSet.getString(7));
-            	athlete.setSportId(resultSet.getString(8));
-            	athlete.setHeight(resultSet.getInt(9));
-            	athlete.setWeight(resultSet.getInt(10));
-            	athlete.setPhoto(resultSet.getBlob(11));
-            	v.add(athlete);   
-            }   
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-			try {
-				statement.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
-				e.printStackTrace();   
-			}
-			
-			try {   
-				connection.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
-				e.printStackTrace();   
-			}   
-		}    
-		return v;
+    /*
+     * get all Athlete List
+     */
+    public Collection<Athlete> listAllAthletes() {
+	Vector<Athlete> v = new Vector<Athlete>();
+	String sql = "SELECT * FROM athlete ORDER BY familyName";
+	Connection connection = null;
+	PreparedStatement statement = null;
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    ResultSet resultSet = statement.executeQuery();
+	    while (resultSet.next()) {
+		Athlete athlete = new Athlete();
+		athlete.setAthleteId(resultSet.getString(1));
+		athlete.setAthleteName(resultSet.getString(2));
+		athlete.setFamilyName(resultSet.getString(3));
+		athlete.setBirthdate(resultSet.getString(4));
+		athlete.setBirthCity(resultSet.getString(5));
+		athlete.setBirthCountry(resultSet.getString(6));
+		athlete.setCountryId(resultSet.getString(7));
+		athlete.setSportId(resultSet.getString(8));
+		athlete.setHeight(resultSet.getInt(9));
+		athlete.setWeight(resultSet.getInt(10));
+		athlete.setPhoto(resultSet.getBlob(11));
+		v.add(athlete);
+	    }
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
+	    try {
+		statement.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close statement !!  ", e);
+		e.printStackTrace();
+	    }
+
+	    try {
+		connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close connectionDB !!  ", e);
+		e.printStackTrace();
+	    }
 	}
+	return v;
+    }
 	
 	/**
 	 * to do next
