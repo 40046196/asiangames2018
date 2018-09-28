@@ -2,12 +2,10 @@ package com.asiangames2018.dao;
 
 import com.asiangames2018.util.DAOUtil;
 
-import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Types;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
@@ -77,6 +75,9 @@ public class AsianGamesDAO extends DAOUtil {
      * for another query statement because it make use of existing
      * listAllCountries().
      * 
+     * Update: since country id is unique (and cannot be changed), check only
+     * the country id
+     * 
      * @param countryToSearch
      * @return true if found; otherwise return false
      */
@@ -86,8 +87,7 @@ public class AsianGamesDAO extends DAOUtil {
 	for (Iterator<Country> i = countryCollection.iterator(); i.hasNext();) {
 	    Country c = i.next();
 	    String countryToFindID = countryToSearch.getCountryId();
-	    String countryToFindName = countryToSearch.getCountryName();
-	    if (countryToFindID.equals(c.getCountryId()) && countryToFindName.equals(c.getCountryName())) {
+	    if (countryToFindID.equals(c.getCountryId())) {
 		condition = true;
 		break;
 	    }
@@ -185,12 +185,12 @@ public class AsianGamesDAO extends DAOUtil {
 		connection = super.getConnection();
 		statement = connection.prepareStatement(updateString);
 		statement.setString(1, country.getCountryName());
-		statement.setString(3, country.getCountryId());
 		if (country.getCountryFlag() == null) {
 		    statement.setNull(2, java.sql.Types.BLOB);
 		} else {
 		    statement.setBlob(2, country.getCountryFlag());
 		}
+		statement.setString(3, country.getCountryId());
 		statement.executeUpdate();
 	    } catch (Exception e) {
 		e.printStackTrace();
@@ -336,7 +336,6 @@ public class AsianGamesDAO extends DAOUtil {
 		logger.log(Level.SEVERE, "Error close statement !!  ", e);
 		e.printStackTrace();
 	    }
-
 	    try {
 		connection.close();
 	    } catch (Exception e) {
@@ -490,7 +489,6 @@ public class AsianGamesDAO extends DAOUtil {
 		    this.insertAthleteSocialMedia(social);
 		}
 	    }
-
 	    if (colHighlight != null) {
 		Iterator<AthleteHighlight> it = colHighlight.iterator();
 		while (it.hasNext()) {
@@ -544,7 +542,6 @@ public class AsianGamesDAO extends DAOUtil {
 		logger.log(Level.SEVERE, "Error close statement !!  ", e);
 		e.printStackTrace();
 	    }
-
 	    try {
 		connection.close();
 	    } catch (Exception e) {
@@ -579,7 +576,6 @@ public class AsianGamesDAO extends DAOUtil {
 		logger.log(Level.SEVERE, "Error close statement !!  ", e);
 		e.printStackTrace();
 	    }
-
 	    try {
 		connection.close();
 	    } catch (Exception e) {

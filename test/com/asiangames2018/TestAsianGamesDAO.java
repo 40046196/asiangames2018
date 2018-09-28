@@ -14,7 +14,11 @@ import com.asiangames2018.entity.Country;
 import com.asiangames2018.util.GeneralLogging;
 
 public class TestAsianGamesDAO {
-    private Logger logger = GeneralLogging.getLogger();
+
+    /**
+     * To test insert, delete, and update country, you
+     * have to test them in order of insert, update, and delete.
+     */
     
     @Test
     public void testListAllCountries() {
@@ -43,13 +47,20 @@ public class TestAsianGamesDAO {
     }
     
     @Test
-    public void testDeleteCountry() {
-	// TODO
+    public void testUpdateCountry() {
+	AsianGamesDAO dao = new AsianGamesDAO();
+	// from Canada -> Canadas
+	Country can = new Country("CAN", "Canadas");
+	dao.updateCountry(can);
+	assertTrue(dao.isCountryExist(can));
     }
     
     @Test
-    public void testUpdateCountry() {
-	// TODO
+    public void testDeleteCountry() {
+	AsianGamesDAO dao = new AsianGamesDAO();
+	Country can = new Country("CAN", "Canada");
+	dao.deleteCountry(can);
+	assertFalse(dao.isCountryExist(can)); // this country must not exist after deletion
     }
     
 }
