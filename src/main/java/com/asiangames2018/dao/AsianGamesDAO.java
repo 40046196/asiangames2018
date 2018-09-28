@@ -267,6 +267,11 @@ public class AsianGamesDAO extends DAOUtil {
 		}   	
 	}
 	
+	public boolean isSportExist2(Sport sportToFind) {
+	    // TODO
+	    return false;
+	}
+	
 	/**
 	 * Checking if a sport exist in the table
 	 * @param sport
@@ -608,6 +613,11 @@ public class AsianGamesDAO extends DAOUtil {
 				e.printStackTrace();   
 			}   
 		}    
+	}
+	
+	public boolean isAthleteExist2(Athlete athleteToFind) {
+	    // TODO see isCountryExist2
+	    return false;
 	}
 	
 	/**
