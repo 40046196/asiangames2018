@@ -1,4 +1,5 @@
 target/
+log/
 properties/dao.properties
 pom.xml.tag
 pom.xml.releaseBackup
