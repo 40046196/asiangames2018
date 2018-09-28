@@ -13,7 +13,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import com.asiangames2018.entity.Country;
 import com.asiangames2018.entity.Sport;
 import com.asiangames2018.entity.TotalMedals;
@@ -30,101 +29,65 @@ import com.asiangames2018.util.GeneralLogging;
  *
  */
 public class AsianGamesDAO extends DAOUtil {
-	private static Logger logger = GeneralLogging.getLogger();
+    private static Logger logger = GeneralLogging.getLogger();
 
-	
-	/*****  COUNTRY TABLES   ***/
-	/**
-	 * Add Country Data
-	 * @param country
-	 */
-	public void insertCountry(Country country) {
-		Connection connection = null;     
-	    PreparedStatement statement = null;
-	    
-	    String sql  = "Insert IGNORE into country(countryId, countryName, countryFlag) values(?,?,?)";
-		try     {       
-			connection = super.getConnection();  			
-			statement = connection.prepareStatement(sql);      
-			statement.setString(1, country.getCountryId());
-			statement.setString(2, country.getCountryName());
-			statement.setBlob(3, country.getCountryFlag());
-			statement.executeUpdate();
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-	    	try {
-	    		if (statement != null) {
-	    			statement.close();
-	    		}
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-	    	try {
-	    		if (connection != null)  connection.close();
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-		}   	
-	}
-	
-	/**
-	 * Version 2 of isCountryExist. Code reused is the best way to go. 
-	 * NO need for another query statement because it make use of existing listAllCountries().
-	 * @param countryToSearch
-	 * @return true if found; otherwise return false
-	 */
-	public boolean isCountryExist2(Country countryToSearch) {
-	    Collection<Country> countryCollection = listAllCountries();
-	    boolean condition = false;
-	    for (int i = 0; i < countryCollection.size(); i++) {
-		if (countryCollection.contains(countryToSearch)) {
-		    condition = true;
-		    break;
+    /***** COUNTRY TABLES ***/
+    /**
+     * Add Country Data
+     * 
+     * @param country
+     */
+    public void insertCountry(Country country) {
+	Connection connection = null;
+	PreparedStatement statement = null;
+
+	String sql = "Insert IGNORE into country(countryId, countryName, countryFlag) values(?,?,?)";
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    statement.setString(1, country.getCountryId());
+	    statement.setString(2, country.getCountryName());
+	    statement.setBlob(3, country.getCountryFlag());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
+	    try {
+		if (statement != null) {
+		    statement.close();
 		}
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
 	    }
-	    return condition;
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    }
 	}
-	
-	/**
-	 * Checking if a country exist in the table
-	 * @param country
-	 * @return
-	 */
-	public boolean isCountryExist(Country country) {
-		Vector<Country> v = new Vector<Country>();
-		boolean isCountryExist = false;
-		String sql = "SELECT * FROM country WHERE countryid = ?";	
-		Connection connection = null;
-		PreparedStatement statement = null;
-		try     {       
-			connection = super.getConnection();       
-			statement = connection.prepareStatement(sql);
-			statement.setString(1, country.getCountryId());
-			ResultSet resultSet = statement.executeQuery();   
-            while (resultSet.next()) {   
-            	isCountryExist = true;
-            }   
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-			try {
-				statement.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
-				e.printStackTrace();   
-			}
-			
-			try {   
-				connection.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
-				e.printStackTrace();   
-			}   
-		}    
-		return isCountryExist;
+    }
+
+    /**
+     * Version 2 of isCountryExist. Code reused is the best way to go. NO need
+     * for another query statement because it make use of existing
+     * listAllCountries().
+     * 
+     * @param countryToSearch
+     * @return true if found; otherwise return false
+     */
+    public boolean isCountryExist2(Country countryToSearch) {
+	Collection<Country> countryCollection = listAllCountries();
+	boolean condition = false;
+	for (int i = 0; i < countryCollection.size(); i++) {
+	    if (countryCollection.contains(countryToSearch)) {
+		condition = true;
+		break;
+	    }
 	}
-	
+	return condition;
+    }
+
     /**
      * delete Country
      * 
@@ -162,7 +125,7 @@ public class AsianGamesDAO extends DAOUtil {
 	    logger.log(Level.WARNING, "This country does not exists!  ");
 	}
     }
-	
+
     /*
      * get all Country List
      */
@@ -201,129 +164,99 @@ public class AsianGamesDAO extends DAOUtil {
 	}
 	return v;
     }
-	
-	/**
-	 * Update Country
-	 * @param country
-	 */
-	public void updateCountry(Country country) {
-		Connection connection = null;     
-	    PreparedStatement statement = null;
-	    String updateString = "UPDATE country  SET countryName = ?, countryFlag = ?  WHERE countryId = ?";
-		    
-		try {
-			connection = super.getConnection();       	    	
-		    statement = connection.prepareStatement(updateString);
-		    statement.setString(1, country.getCountryName());
-		    statement.setString(2,  country.getCountryId());
-		    statement.setBlob(3, country.getCountryFlag());
-		    statement.executeUpdate();
-		} catch (Exception e ) {
-		   	e.printStackTrace();
-	    } finally {
-	    	try {
-	    		if (statement != null) {
-	    			statement.close();
-	    		}
-	    	} catch (Exception e) {
-	    		e.printStackTrace();
-	    	}
-	    	try {
-	    		if (connection != null)  connection.close();
-	    	} catch (Exception e) {
-	    		e.printStackTrace();
-	    	}
-	    }		
-	}
-	
-	
-	/*****  SPORTS TABLES   ***/
-	/**
-	 * Add Sport Data
-	 * @param sport
-	 */
-	public void insertSport(Sport sport) {
-		Connection connection = null;     
-	    PreparedStatement statement = null;
-	    
-	    String sql  = "Insert IGNORE into sport(sportId, sportName, sportIcon, sportImage) values(?,?,?,?)";
-		try     {       
-			connection = super.getConnection();  			
-			statement = connection.prepareStatement(sql);      
-			statement.setString(1, sport.getSportId());
-			statement.setString(2, sport.getSportName());
-			statement.setBlob(3, sport.getSportIcon());
-			statement.setBlob(4, sport.getSportImage());
-			statement.executeUpdate();
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-	    	try {
-	    		if (statement != null) {
-	    			statement.close();
-	    		}
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-	    	try {
-	    		if (connection != null)  connection.close();
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-		}   	
-	}
-	
-	public boolean isSportExist2(Sport sportToFind) {
-	    Collection<Sport> sportCollection = listAllSports();
-	    boolean condition = false;
-	    for (int i = 0; i < sportCollection.size(); i++) {
-		if (sportCollection.contains(sportToFind)) {
-		    condition = true;
-		    break;
+
+    /**
+     * Update Country
+     * 
+     * @param country
+     */
+    public void updateCountry(Country country) {
+	Connection connection = null;
+	PreparedStatement statement = null;
+	String updateString = "UPDATE country  SET countryName = ?, countryFlag = ?  WHERE countryId = ?";
+
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(updateString);
+	    statement.setString(1, country.getCountryName());
+	    statement.setString(2, country.getCountryId());
+	    statement.setBlob(3, country.getCountryFlag());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	} finally {
+	    try {
+		if (statement != null) {
+		    statement.close();
 		}
+	    } catch (Exception e) {
+		e.printStackTrace();
 	    }
-	    return condition;
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
 	}
-	
-	/**
-	 * Checking if a sport exist in the table
-	 * @param sport
-	 * @return
-	 */
-	public boolean isSportExist(Sport sport) {
-		Vector<Sport> v = new Vector<Sport>();
-		boolean isSportExist = false;
-		String sql = "SELECT * FROM sport WHERE countryid = ?";	
-		Connection connection = null;
-		PreparedStatement statement = null;
-		try     {       
-			connection = super.getConnection();       
-			statement = connection.prepareStatement(sql);
-			statement.setString(1, sport.getSportId());
-			ResultSet resultSet = statement.executeQuery();   
-            while (resultSet.next()) {   
-            	isSportExist = true;
-            }   
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-			try {
-				statement.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
-				e.printStackTrace();   
-			}
-			
-			try {   
-				connection.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
-				e.printStackTrace();   
-			}   
-		}    
-		return isSportExist;
+    }
+
+    /***** SPORTS TABLES ***/
+    /**
+     * Add Sport Data
+     * 
+     * @param sport
+     */
+    public void insertSport(Sport sport) {
+	Connection connection = null;
+	PreparedStatement statement = null;
+
+	String sql = "Insert IGNORE into sport(sportId, sportName, sportIcon, sportImage) values(?,?,?,?)";
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    statement.setString(1, sport.getSportId());
+	    statement.setString(2, sport.getSportName());
+	    statement.setBlob(3, sport.getSportIcon());
+	    statement.setBlob(4, sport.getSportImage());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
+	    try {
+		if (statement != null) {
+		    statement.close();
+		}
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    }
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    }
 	}
-	
+    }
+
+    /**
+     * Checking if a sport exist in the table
+     * 
+     * @param sportToFind
+     * @return
+     */
+    public boolean isSportExist2(Sport sportToFind) {
+	Collection<Sport> sportCollection = listAllSports();
+	boolean condition = false;
+	for (int i = 0; i < sportCollection.size(); i++) {
+	    if (sportCollection.contains(sportToFind)) {
+		condition = true;
+		break;
+	    }
+	}
+	return condition;
+    }
+
     /**
      * delete Sport
      * 
@@ -360,7 +293,7 @@ public class AsianGamesDAO extends DAOUtil {
 	    logger.log(Level.WARNING, "This sport does not exists!");
 	}
     }
-	
+
     /*
      * get all Sport List
      */
@@ -400,41 +333,43 @@ public class AsianGamesDAO extends DAOUtil {
 	}
 	return v;
     }
-	
-	/**
-	 * Update Sport
-	 * @param Sport
-	 */
-	public void updateSport(Sport sport) {
-		Connection connection = null;     
-	    PreparedStatement statement = null;
-	    String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
-		    
-		try {
-			connection = super.getConnection();       	    	
-		    statement = connection.prepareStatement(updateString);
-		    statement.setString(1, sport.getSportName());
-		    statement.setBlob(2,  sport.getSportIcon());
-		    statement.setBlob(3, sport.getSportImage());
-		    statement.executeUpdate();
-		} catch (Exception e ) {
-		   	e.printStackTrace();
-	    } finally {
-	    	try {
-	    		if (statement != null) {
-	    			statement.close();
-	    		}
-	    	} catch (Exception e) {
-	    		e.printStackTrace();
-	    	}
-	    	try {
-	    		if (connection != null)  connection.close();
-	    	} catch (Exception e) {
-	    		e.printStackTrace();
-	    	}
-	    }		
-	}	
-	
+
+    /**
+     * Update Sport
+     * 
+     * @param Sport
+     */
+    public void updateSport(Sport sport) {
+	Connection connection = null;
+	PreparedStatement statement = null;
+	String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
+
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(updateString);
+	    statement.setString(1, sport.getSportName());
+	    statement.setBlob(2, sport.getSportIcon());
+	    statement.setBlob(3, sport.getSportImage());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	} finally {
+	    try {
+		if (statement != null) {
+		    statement.close();
+		}
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	}
+    }
+
     /***** ATHLETES TABLES ***/
     /**
      * Normally when playing with store procedure (SP) the format is : ? =
@@ -568,7 +503,7 @@ public class AsianGamesDAO extends DAOUtil {
 	    }
 	}
     }
-	
+
     private void insertAthleteHighlight(AthleteHighlight highlight) {
 	String sql = "INSERT IGNORE INTO athletehighlight values (?,?,?,?,?,?,?)";
 	Connection connection = null;
@@ -602,8 +537,7 @@ public class AsianGamesDAO extends DAOUtil {
 	    }
 	}
     }
-	
-	
+
     /**
      * insert athlete social media account ex: fB, instagram, telegram, Whatsup,
      * etc..
@@ -638,58 +572,25 @@ public class AsianGamesDAO extends DAOUtil {
 	    }
 	}
     }
-	
-	public boolean isAthleteExist2(Athlete athleteToFind) {
-	    Collection<Athlete> athleteCollection = listAllAthletes();
-	    boolean condition = false;
-	    for (int i = 0; i < athleteCollection.size(); i++) {
-		if (athleteCollection.contains(athleteToFind)) {
-		    condition = true;
-		    break;
-		}
+
+    /**
+     * Checking if a Athlete exist in the table
+     * 
+     * @param athleteToFind
+     * @return
+     */
+    public boolean isAthleteExist2(Athlete athleteToFind) {
+	Collection<Athlete> athleteCollection = listAllAthletes();
+	boolean condition = false;
+	for (int i = 0; i < athleteCollection.size(); i++) {
+	    if (athleteCollection.contains(athleteToFind)) {
+		condition = true;
+		break;
 	    }
-	    return condition;
 	}
-	
-	/**
-	 * Checking if a Athlete exist in the table
-	 * @param Athlete
-	 * @return
-	 */
-	public boolean isAthleteExist(Athlete athlete) {
-		Vector<Athlete> v = new Vector<Athlete>();
-		boolean isAthleteExist = false;
-		String sql = "SELECT * FROM athlete WHERE athleteId = ?";	
-		Connection connection = null;
-		PreparedStatement statement = null;
-		try     {       
-			connection = super.getConnection();       
-			statement = connection.prepareStatement(sql);
-			statement.setString(1, athlete.getAthleteId());
-			ResultSet resultSet = statement.executeQuery();   
-            while (resultSet.next()) {   
-            	isAthleteExist = true;
-            }   
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-			try {
-				statement.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
-				e.printStackTrace();   
-			}
-			
-			try {   
-				connection.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
-				e.printStackTrace();   
-			}   
-		}    
-		return isAthleteExist;
-	}
-	
+	return condition;
+    }
+
     /**
      * delete Athlete
      * 
@@ -726,7 +627,7 @@ public class AsianGamesDAO extends DAOUtil {
 	    logger.log(Level.WARNING, "This athlete does not exists!");
 	}
     }
-	
+
     /*
      * get all Athlete List
      */
@@ -773,41 +674,41 @@ public class AsianGamesDAO extends DAOUtil {
 	}
 	return v;
     }
-	
-	/**
-	 * to do next
-	 * Update Sport
-	 * @param Sport
-	 */
-	public void updateAthlete(Sport sport) {
-		Connection connection = null;     
-	    PreparedStatement statement = null;
-	    String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
-		    
-		try {
-			connection = super.getConnection();       	    	
-		    statement = connection.prepareStatement(updateString);
-		    statement.setString(1, sport.getSportName());
-		    statement.setBlob(2,  sport.getSportIcon());
-		    statement.setBlob(3, sport.getSportImage());
-		    statement.executeUpdate();
-		} catch (Exception e ) {
-		   	e.printStackTrace();
-	    } finally {
-	    	try {
-	    		if (statement != null) {
-	    			statement.close();
-	    		}
-	    	} catch (Exception e) {
-	    		e.printStackTrace();
-	    	}
-	    	try {
-	    		if (connection != null)  connection.close();
-	    	} catch (Exception e) {
-	    		e.printStackTrace();
-	    	}
-	    }		
-	}		
-	
+
+    /**
+     * to do next Update Sport
+     * 
+     * @param Sport
+     */
+    public void updateAthlete(Sport sport) {
+	Connection connection = null;
+	PreparedStatement statement = null;
+	String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
+
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(updateString);
+	    statement.setString(1, sport.getSportName());
+	    statement.setBlob(2, sport.getSportIcon());
+	    statement.setBlob(3, sport.getSportImage());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	} finally {
+	    try {
+		if (statement != null) {
+		    statement.close();
+		}
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
+	}
+    }
 
 }
