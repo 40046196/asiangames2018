@@ -69,6 +69,24 @@ public class AsianGamesDAO extends DAOUtil {
 	}
 	
 	/**
+	 * Version 2 of isCountryExist. Code reused is the best way to go. 
+	 * NO need for another query statement because it make use of existing listAllCountries().
+	 * @param countryToSearch
+	 * @return true if found; otherwise return false
+	 */
+	public boolean isCountryExist2(Country countryToSearch) {
+	    Collection<Country> countryCollection = listAllCountries();
+	    boolean condition = false;
+	    for (int i = 0; i < countryCollection.size(); i++) {
+		if (countryCollection.contains(countryToSearch)) {
+		    condition = true;
+		    break;
+		}
+	    }
+	    return condition;
+	}
+	
+	/**
 	 * Checking if a country exist in the table
 	 * @param country
 	 * @return
