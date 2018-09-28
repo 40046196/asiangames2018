@@ -2,6 +2,7 @@ package com.asiangames2018.dao;
 
 import com.asiangames2018.util.DAOUtil;
 
+import java.sql.Blob;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -40,14 +41,18 @@ public class AsianGamesDAO extends DAOUtil {
     public void insertCountry(Country country) {
 	Connection connection = null;
 	PreparedStatement statement = null;
-
 	String sql = "Insert IGNORE into country(countryId, countryName, countryFlag) values(?,?,?)";
 	try {
 	    connection = super.getConnection();
 	    statement = connection.prepareStatement(sql);
 	    statement.setString(1, country.getCountryId());
 	    statement.setString(2, country.getCountryName());
-	    statement.setBlob(3, country.getCountryFlag());
+	    if (country.getCountryFlag() != null) {
+		statement.setBlob(3, country.getCountryFlag());
+	    } else {
+		Blob b = null;
+		statement.setBlob(3, b);
+	    }
 	    statement.executeUpdate();
 	} catch (Exception e) {
 	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);

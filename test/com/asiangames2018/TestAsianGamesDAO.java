@@ -29,4 +29,12 @@ public class TestAsianGamesDAO {
 	assertFalse(dao.isCountryExist(new Country("XYZ", "Nowhere")));
     }
     
+    @Test
+    public void testInsertCountry() {
+	AsianGamesDAO dao = new AsianGamesDAO();
+	Country can = new Country("CAN", "Canada");
+	dao.insertCountry(can);
+	assertTrue(dao.isCountryExist(can));
+    }
+    
 }
