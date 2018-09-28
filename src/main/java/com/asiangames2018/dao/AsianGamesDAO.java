@@ -323,37 +323,42 @@ public class AsianGamesDAO extends DAOUtil {
 		return isSportExist;
 	}
 	
-	/**
-	 * delete Sport
-	 * @param sport
-	 */
-	public void deleteSport(Sport sport) {
-		Connection connection = null;     
+    /**
+     * delete Sport
+     * 
+     * @param sport
+     */
+    public void deleteSport(Sport sport) {
+	if (isSportExist2(sport)) {
+	    Connection connection = null;
 	    PreparedStatement statement = null;
-	    
-	    String sql  = "DELETE FROM sport WHERE sportId = ?";
-		try     {       
-			connection = super.getConnection();  			
-			statement = connection.prepareStatement(sql);      
-			statement.setString(1, sport.getSportId());
-			statement.executeUpdate();
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-	    	try {
-	    		if (statement != null) {
-	    			statement.close();
-	    		}
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-	    	try {
-	    		if (connection != null)  connection.close();
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-		}   	
+	    String sql = "DELETE FROM sport WHERE sportId = ?";
+	    try {
+		connection = super.getConnection();
+		statement = connection.prepareStatement(sql);
+		statement.setString(1, sport.getSportId());
+		statement.executeUpdate();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    } finally {
+		try {
+		    if (statement != null) {
+			statement.close();
+		    }
+		} catch (Exception e) {
+		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+		}
+		try {
+		    if (connection != null)
+			connection.close();
+		} catch (Exception e) {
+		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+		}
+	    }
+	} else {
+	    logger.log(Level.WARNING, "This sport does not exists!");
 	}
+    }
 	
 	/*
 	 * get all Sport List
@@ -678,37 +683,42 @@ public class AsianGamesDAO extends DAOUtil {
 		return isAthleteExist;
 	}
 	
-	/**
-	 * delete Athlete
-	 * @param Athlete
-	 */
-	public void deleteAthlete(Athlete athlete) {
-		Connection connection = null;     
+    /**
+     * delete Athlete
+     * 
+     * @param Athlete
+     */
+    public void deleteAthlete(Athlete athlete) {
+	if (isAthleteExist2(athlete)) {
+	    Connection connection = null;
 	    PreparedStatement statement = null;
-	    
-	    String sql  = "DELETE FROM athlete WHERE athleteId = ?";
-		try     {       
-			connection = super.getConnection();  			
-			statement = connection.prepareStatement(sql);      
-			statement.setString(1, athlete.getAthleteId());
-			statement.executeUpdate();
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-	    	try {
-	    		if (statement != null) {
-	    			statement.close();
-	    		}
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-	    	try {
-	    		if (connection != null)  connection.close();
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-		}   	
+	    String sql = "DELETE FROM athlete WHERE athleteId = ?";
+	    try {
+		connection = super.getConnection();
+		statement = connection.prepareStatement(sql);
+		statement.setString(1, athlete.getAthleteId());
+		statement.executeUpdate();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    } finally {
+		try {
+		    if (statement != null) {
+			statement.close();
+		    }
+		} catch (Exception e) {
+		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+		}
+		try {
+		    if (connection != null)
+			connection.close();
+		} catch (Exception e) {
+		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+		}
+	    }
+	} else {
+	    logger.log(Level.WARNING, "This athlete does not exists!");
 	}
+    }
 	
 	/*
 	 * get all Athlete List
