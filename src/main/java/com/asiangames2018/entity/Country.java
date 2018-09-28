@@ -11,6 +11,10 @@ public class Country {
 	public Country() {
 		
 	}
+	public Country(String countryId, String countryName) {
+		this.countryId = countryId;
+		this.countryName = countryName;
+	}
 	public Country(String countryId, String countryName, Blob countryFlag) {
 		this.countryId = countryId;
 		this.countryName = countryName;

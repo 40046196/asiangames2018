@@ -76,11 +76,14 @@ public class AsianGamesDAO extends DAOUtil {
      * @param countryToSearch
      * @return true if found; otherwise return false
      */
-    public boolean isCountryExist2(Country countryToSearch) {
+    public boolean isCountryExist(Country countryToSearch) {
 	Collection<Country> countryCollection = listAllCountries();
-	boolean condition = false;
-	for (int i = 0; i < countryCollection.size(); i++) {
-	    if (countryCollection.contains(countryToSearch)) {
+	boolean condition = false; 
+	for (Iterator<Country> i = countryCollection.iterator(); i.hasNext();) {
+	    Country c = i.next();
+	    String countryToFindID = countryToSearch.getCountryId();
+	    String countryToFindName = countryToSearch.getCountryName();
+	    if (countryToFindID.equals(c.getCountryId()) && countryToFindName.equals(c.getCountryName())) {
 		condition = true;
 		break;
 	    }
@@ -95,7 +98,7 @@ public class AsianGamesDAO extends DAOUtil {
      */
     public void deleteCountry(Country country) {
 	// make sure country you're deleting exists
-	if (isCountryExist2(country)) {
+	if (isCountryExist(country)) {
 	    Connection connection = null;
 	    PreparedStatement statement = null;
 	    String sql = "DELETE FROM country WHERE countryId = ?";
@@ -154,7 +157,6 @@ public class AsianGamesDAO extends DAOUtil {
 		logger.log(Level.SEVERE, "Error close statement !!  ", e);
 		e.printStackTrace();
 	    }
-
 	    try {
 		connection.close();
 	    } catch (Exception e) {
@@ -171,7 +173,7 @@ public class AsianGamesDAO extends DAOUtil {
      * @param country
      */
     public void updateCountry(Country country) {
-	if (isCountryExist2(country)) {
+	if (isCountryExist(country)) {
 	    Connection connection = null;
 	    PreparedStatement statement = null;
 	    String updateString = "UPDATE country  SET countryName = ?, countryFlag = ?  WHERE countryId = ?";
