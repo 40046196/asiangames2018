@@ -268,8 +268,15 @@ public class AsianGamesDAO extends DAOUtil {
 	}
 	
 	public boolean isSportExist2(Sport sportToFind) {
-	    // TODO
-	    return false;
+	    Collection<Sport> sportCollection = listAllSports();
+	    boolean condition = false;
+	    for (int i = 0; i < sportCollection.size(); i++) {
+		if (sportCollection.contains(sportToFind)) {
+		    condition = true;
+		    break;
+		}
+	    }
+	    return condition;
 	}
 	
 	/**
@@ -616,8 +623,15 @@ public class AsianGamesDAO extends DAOUtil {
 	}
 	
 	public boolean isAthleteExist2(Athlete athleteToFind) {
-	    // TODO see isCountryExist2
-	    return false;
+	    Collection<Athlete> athleteCollection = listAllAthletes();
+	    boolean condition = false;
+	    for (int i = 0; i < athleteCollection.size(); i++) {
+		if (athleteCollection.contains(athleteToFind)) {
+		    condition = true;
+		    break;
+		}
+	    }
+	    return condition;
 	}
 	
 	/**
