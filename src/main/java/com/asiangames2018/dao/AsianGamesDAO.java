@@ -125,38 +125,39 @@ public class AsianGamesDAO extends DAOUtil {
 		return isCountryExist;
 	}
 	
-	/**
-	 * delete Country
-	 * @param country
-	 */
+    /**
+     * delete Country
+     * 
+     * @param country
+     */
     public void deleteCountry(Country country) {
 	// make sure country you're deleting exists
 	if (isCountryExist2(country)) {
 	    Connection connection = null;
-		PreparedStatement statement = null;
-		String sql = "DELETE FROM country WHERE countryId = ?";
+	    PreparedStatement statement = null;
+	    String sql = "DELETE FROM country WHERE countryId = ?";
+	    try {
+		connection = super.getConnection();
+		statement = connection.prepareStatement(sql);
+		statement.setString(1, country.getCountryId());
+		statement.executeUpdate();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    } finally {
 		try {
-		    connection = super.getConnection();
-		    statement = connection.prepareStatement(sql);
-		    statement.setString(1, country.getCountryId());
-		    statement.executeUpdate();
+		    if (statement != null) {
+			statement.close();
+		    }
 		} catch (Exception e) {
 		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-		} finally {
-		    try {
-			if (statement != null) {
-			    statement.close();
-			}
-		    } catch (Exception e) {
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-		    }
-		    try {
-			if (connection != null)
-			    connection.close();
-		    } catch (Exception e) {
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-		    }
-		}    
+		}
+		try {
+		    if (connection != null)
+			connection.close();
+		} catch (Exception e) {
+		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+		}
+	    }
 	} else {
 	    logger.log(Level.WARNING, "This country does not exists!  ");
 	}
@@ -434,203 +435,209 @@ public class AsianGamesDAO extends DAOUtil {
 	    }		
 	}	
 	
-	/*****  ATHLETES TABLES   ***/
-	/**
-	 * Normally when playing with store procedure (SP) the format is :
-	 *  ?  =  PackageAthlete.InsertAthlete(?,?,?,?....); 
-	 *  if  the return value is successful then you can continue with the next procedure
-	 *  or use the return value for your next input in the apps. 
-	 *  
-	 *  In this apps, we just show how to insert into more than one tables at once,
-	 *  SP will handle whether they have to insert or update.. 
+    /***** ATHLETES TABLES ***/
+    /**
+     * Normally when playing with store procedure (SP) the format is : ? =
+     * PackageAthlete.InsertAthlete(?,?,?,?....); if the return value is
+     * successful then you can continue with the next procedure or use the
+     * return value for your next input in the apps.
+     * 
+     * In this apps, we just show how to insert into more than one tables at
+     * once, SP will handle whether they have to insert or update..
+     * 
+     * Add Athlete Data
+     * 
+     * @param Athlete
+     */
+    public void insertAthlete(Athlete athlete) {
+	Connection connection = null;
+	CallableStatement statement = null;
+	TotalMedals totalMedals = athlete.getMedals();
+	AthleteBiography biography = athlete.getBio();
+	Collection socials = biography.getSocialMedia();
+	Collection colHighlight = biography.getHighlight();
 
-	 * Add Athlete Data
-	 * @param Athlete
-	 */
-	public void insertAthlete(Athlete athlete) {
-		Connection connection = null;     
-	    CallableStatement statement = null;
-	    TotalMedals totalMedals = athlete.getMedals();
-	    AthleteBiography biography = athlete.getBio();
-	    Collection socials = biography.getSocialMedia();
-	    Collection colHighlight = biography.getHighlight();
-	    
-	    String sql = "CALL insertAthlete(?,?,?,?,?,?,?,?,?,?,?,"   // athlete  
-	    			+ "?,?,?,"  // totalMedal [gold, silver, bronze 
-	    			+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; //biography withouth highlights and socialmedias 
-	    
-		try  {       
-			connection = super.getConnection();  		
-//			statement = connection.prepareStatement(sql);      
-		    statement = connection.prepareCall(sql);
-			
-			// athlete main data
-			statement.setString(1, athlete.getAthleteId());
-			statement.setString(2, athlete.getAthleteName());
-			statement.setString(3, athlete.getFamilyName());
-			statement.setString(4, athlete.getBirthdate());
-			statement.setString(5, athlete.getBirthCity());
-			statement.setString(6,  athlete.getBirthCountry());
-			statement.setString(7, athlete.getCountryId());
-			statement.setString(8,  athlete.getSportId());
-			statement.setInt(9,  athlete.getHeight());
-			statement.setInt(10, athlete.getWeight());
-			statement.setBlob(11, athlete.getPhoto());
-			
-			// athlete medals
-			statement.setInt(12, totalMedals.getGold());
-			statement.setInt(13, totalMedals.getSilver());
-			statement.setInt(14, totalMedals.getBronze());
-			
-			// athlete biography there are 17 items
-			if (biography!=null) {
-				statement.setString(15, biography.getBeginning());
-				statement.setString(16, biography.getDebut());
-				statement.setString(17, biography.getReason());
-				statement.setString(18, biography.getCoach());
-				statement.setString(19, biography.getTraining());
-				statement.setString(20, biography.getAmbition());
-				statement.setString(21, biography.getAwards());
-				statement.setString(22, biography.getHero());
-				statement.setString(23, biography.getMemorable());
-				statement.setString(24, biography.getInfluence());
-				statement.setString(25, biography.getNickname());
-				statement.setString(26, biography.getRelatives());
-				statement.setString(27, biography.getInjuries());
-				statement.setString(28, biography.getEducation());
-				statement.setString(29, biography.getLanguage());
-				statement.setString(30, biography.getHobbies());
-				statement.setString(31, biography.getAdditionalInformation());
-			} else {
-				statement.setNull(15, java.sql.Types.NULL);
-				statement.setNull(16, java.sql.Types.NULL);
-				statement.setNull(17, java.sql.Types.NULL);
-				statement.setNull(18, java.sql.Types.NULL);
-				statement.setNull(19, java.sql.Types.NULL);
-				statement.setNull(20, java.sql.Types.NULL);
-				statement.setNull(21, java.sql.Types.NULL);
-				statement.setNull(22, java.sql.Types.NULL);
-				statement.setNull(23, java.sql.Types.NULL);
-				statement.setNull(24, java.sql.Types.NULL);
-				statement.setNull(25, java.sql.Types.NULL);
-				statement.setNull(26, java.sql.Types.NULL);
-				statement.setNull(27, java.sql.Types.NULL);
-				statement.setNull(28, java.sql.Types.NULL);
-				statement.setNull(29, java.sql.Types.NULL);
-				statement.setNull(30, java.sql.Types.NULL);
-				statement.setNull(31, java.sql.Types.NULL);
-			}
-			
-			// not comfortable with this type, because you will open more than one connection SQL
-			// if this is transactional avoid this kind of connection.. or database connection could be hang
-			// once too many connection opened and unclosed..  -->  RESET database server..
-			// just fine for this stand alone application..
-			if (socials != null ) {
-				Iterator<AthleteSocial> it = socials.iterator();
-				while (it.hasNext()) {
-					AthleteSocial social = it.next();
-					this.insertAthleteSocialMedia(social);
-				}
-			}
-			
-			if (colHighlight != null ) {
-				Iterator<AthleteHighlight> it = colHighlight.iterator();
-				while (it.hasNext()) {
-					AthleteHighlight highlight = it.next();
-					this.insertAthleteHighlight(highlight);
-				}
-			}
-			
-			
-			
-			statement.executeUpdate();
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-			logger.info("Error for this message " + athlete.toString());
-		} finally {   
-	    	try {
-	    		if (statement != null) {
-	    			statement.close();
-	    		}
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-	    	try {
-	    		if (connection != null)  connection.close();
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-		}   	
+	String sql = "CALL insertAthlete(?,?,?,?,?,?,?,?,?,?,?," // athlete
+		+ "?,?,?," // totalMedal [gold, silver, bronze
+		+ "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; // biography withouth
+							// highlights and
+							// socialmedias
+
+	try {
+	    connection = super.getConnection();
+	    // statement = connection.prepareStatement(sql);
+	    statement = connection.prepareCall(sql);
+
+	    // athlete main data
+	    statement.setString(1, athlete.getAthleteId());
+	    statement.setString(2, athlete.getAthleteName());
+	    statement.setString(3, athlete.getFamilyName());
+	    statement.setString(4, athlete.getBirthdate());
+	    statement.setString(5, athlete.getBirthCity());
+	    statement.setString(6, athlete.getBirthCountry());
+	    statement.setString(7, athlete.getCountryId());
+	    statement.setString(8, athlete.getSportId());
+	    statement.setInt(9, athlete.getHeight());
+	    statement.setInt(10, athlete.getWeight());
+	    statement.setBlob(11, athlete.getPhoto());
+
+	    // athlete medals
+	    statement.setInt(12, totalMedals.getGold());
+	    statement.setInt(13, totalMedals.getSilver());
+	    statement.setInt(14, totalMedals.getBronze());
+
+	    // athlete biography there are 17 items
+	    if (biography != null) {
+		statement.setString(15, biography.getBeginning());
+		statement.setString(16, biography.getDebut());
+		statement.setString(17, biography.getReason());
+		statement.setString(18, biography.getCoach());
+		statement.setString(19, biography.getTraining());
+		statement.setString(20, biography.getAmbition());
+		statement.setString(21, biography.getAwards());
+		statement.setString(22, biography.getHero());
+		statement.setString(23, biography.getMemorable());
+		statement.setString(24, biography.getInfluence());
+		statement.setString(25, biography.getNickname());
+		statement.setString(26, biography.getRelatives());
+		statement.setString(27, biography.getInjuries());
+		statement.setString(28, biography.getEducation());
+		statement.setString(29, biography.getLanguage());
+		statement.setString(30, biography.getHobbies());
+		statement.setString(31, biography.getAdditionalInformation());
+	    } else {
+		statement.setNull(15, java.sql.Types.NULL);
+		statement.setNull(16, java.sql.Types.NULL);
+		statement.setNull(17, java.sql.Types.NULL);
+		statement.setNull(18, java.sql.Types.NULL);
+		statement.setNull(19, java.sql.Types.NULL);
+		statement.setNull(20, java.sql.Types.NULL);
+		statement.setNull(21, java.sql.Types.NULL);
+		statement.setNull(22, java.sql.Types.NULL);
+		statement.setNull(23, java.sql.Types.NULL);
+		statement.setNull(24, java.sql.Types.NULL);
+		statement.setNull(25, java.sql.Types.NULL);
+		statement.setNull(26, java.sql.Types.NULL);
+		statement.setNull(27, java.sql.Types.NULL);
+		statement.setNull(28, java.sql.Types.NULL);
+		statement.setNull(29, java.sql.Types.NULL);
+		statement.setNull(30, java.sql.Types.NULL);
+		statement.setNull(31, java.sql.Types.NULL);
+	    }
+
+	    // not comfortable with this type, because you will open more than
+	    // one connection SQL
+	    // if this is transactional avoid this kind of connection.. or
+	    // database connection could be hang
+	    // once too many connection opened and unclosed.. --> RESET database
+	    // server..
+	    // just fine for this stand alone application..
+	    if (socials != null) {
+		Iterator<AthleteSocial> it = socials.iterator();
+		while (it.hasNext()) {
+		    AthleteSocial social = it.next();
+		    this.insertAthleteSocialMedia(social);
+		}
+	    }
+
+	    if (colHighlight != null) {
+		Iterator<AthleteHighlight> it = colHighlight.iterator();
+		while (it.hasNext()) {
+		    AthleteHighlight highlight = it.next();
+		    this.insertAthleteHighlight(highlight);
+		}
+	    }
+
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    logger.info("Error for this message " + athlete.toString());
+	} finally {
+	    try {
+		if (statement != null) {
+		    statement.close();
+		}
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    }
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    }
 	}
+    }
 	
-	private void insertAthleteHighlight(AthleteHighlight highlight) {
-		String sql = "INSERT IGNORE INTO athletehighlight values (?,?,?,?,?,?,?)";	
-		Connection connection = null;
-		PreparedStatement statement = null;
-		try     {       
-			connection = super.getConnection();       
-			statement = connection.prepareStatement(sql);
-			statement.setString(1, highlight.getAthleteId());
-			statement.setString(2, highlight.getEventName());
-			statement.setString(3, highlight.getRank());
-			statement.setString(4, highlight.getSportCategory());
-			statement.setString(5, highlight.getYear());
-			statement.setString(6, highlight.getLocation());
-			statement.setString(7, highlight.getBestScoreTime());
-			statement.executeUpdate();
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-			try {
-				statement.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
-				e.printStackTrace();   
-			}
-			
-			try {   
-				connection.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
-				e.printStackTrace();   
-			}   
-		}    
+    private void insertAthleteHighlight(AthleteHighlight highlight) {
+	String sql = "INSERT IGNORE INTO athletehighlight values (?,?,?,?,?,?,?)";
+	Connection connection = null;
+	PreparedStatement statement = null;
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    statement.setString(1, highlight.getAthleteId());
+	    statement.setString(2, highlight.getEventName());
+	    statement.setString(3, highlight.getRank());
+	    statement.setString(4, highlight.getSportCategory());
+	    statement.setString(5, highlight.getYear());
+	    statement.setString(6, highlight.getLocation());
+	    statement.setString(7, highlight.getBestScoreTime());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
+	    try {
+		statement.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close statement !!  ", e);
+		e.printStackTrace();
+	    }
+
+	    try {
+		connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close connectionDB !!  ", e);
+		e.printStackTrace();
+	    }
 	}
+    }
 	
 	
-	/**
-	 * insert athlete social media account 
-	 * ex:  fB,  instagram,  telegram, Whatsup, etc..
-	 * @param social
-	 */
-	private void insertAthleteSocialMedia(AthleteSocial social) {
-		String sql = "INSERT IGNORE INTO athletesocial values (?,?)";	
-		Connection connection = null;
-		PreparedStatement statement = null;
-		try     {       
-			connection = super.getConnection();       
-			statement = connection.prepareStatement(sql);
-			statement.setString(1, social.getAthleteId());
-			statement.setString(2, social.getSocialAccount());
-			statement.executeUpdate();
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-			try {
-				statement.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close statement !!  ",  e );
-				e.printStackTrace();   
-			}
-			
-			try {   
-				connection.close();   
-			} catch (Exception e) {   
-				logger.log(Level.SEVERE, "Error close connectionDB !!  ",  e );
-				e.printStackTrace();   
-			}   
-		}    
+    /**
+     * insert athlete social media account ex: fB, instagram, telegram, Whatsup,
+     * etc..
+     * 
+     * @param social
+     */
+    private void insertAthleteSocialMedia(AthleteSocial social) {
+	String sql = "INSERT IGNORE INTO athletesocial values (?,?)";
+	Connection connection = null;
+	PreparedStatement statement = null;
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    statement.setString(1, social.getAthleteId());
+	    statement.setString(2, social.getSocialAccount());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
+	    try {
+		statement.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close statement !!  ", e);
+		e.printStackTrace();
+	    }
+
+	    try {
+		connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Error close connectionDB !!  ", e);
+		e.printStackTrace();
+	    }
 	}
+    }
 	
 	public boolean isAthleteExist2(Athlete athleteToFind) {
 	    Collection<Athlete> athleteCollection = listAllAthletes();
