@@ -50,8 +50,7 @@ public class AsianGamesDAO extends DAOUtil {
 	    if (country.getCountryFlag() != null) {
 		statement.setBlob(3, country.getCountryFlag());
 	    } else {
-		Blob b = null;
-		statement.setBlob(3, b);
+		statement.setNull(3, java.sql.Types.BLOB);
 	    }
 	    statement.executeUpdate();
 	} catch (Exception e) {
@@ -186,8 +185,12 @@ public class AsianGamesDAO extends DAOUtil {
 		connection = super.getConnection();
 		statement = connection.prepareStatement(updateString);
 		statement.setString(1, country.getCountryName());
-		statement.setString(2, country.getCountryId());
-		statement.setBlob(3, country.getCountryFlag());
+		statement.setString(3, country.getCountryId());
+		if (country.getCountryFlag() == null) {
+		    statement.setNull(2, java.sql.Types.BLOB);
+		} else {
+		    statement.setBlob(2, country.getCountryFlag());
+		}
 		statement.executeUpdate();
 	    } catch (Exception e) {
 		e.printStackTrace();

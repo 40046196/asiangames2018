@@ -4,12 +4,17 @@ import static org.junit.Assert.*;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.junit.Test;
 
 import com.asiangames2018.dao.AsianGamesDAO;
 import com.asiangames2018.entity.Country;
+import com.asiangames2018.util.GeneralLogging;
 
 public class TestAsianGamesDAO {
+    private Logger logger = GeneralLogging.getLogger();
     
     @Test
     public void testListAllCountries() {
@@ -35,6 +40,16 @@ public class TestAsianGamesDAO {
 	Country can = new Country("CAN", "Canada");
 	dao.insertCountry(can);
 	assertTrue(dao.isCountryExist(can));
+    }
+    
+    @Test
+    public void testDeleteCountry() {
+	// TODO
+    }
+    
+    @Test
+    public void testUpdateCountry() {
+	// TODO
     }
     
 }
