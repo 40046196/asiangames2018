@@ -129,33 +129,38 @@ public class AsianGamesDAO extends DAOUtil {
 	 * delete Country
 	 * @param country
 	 */
-	public void deleteCountry(Country country) {
-		Connection connection = null;     
-	    PreparedStatement statement = null;
-	    
-	    String sql  = "DELETE FROM country WHERE countryId = ?";
-		try     {       
-			connection = super.getConnection();  			
-			statement = connection.prepareStatement(sql);      
-			statement.setString(1, country.getCountryId());
-			statement.executeUpdate();
-		} catch (Exception e) {   
-			logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-		} finally {   
-	    	try {
-	    		if (statement != null) {
-	    			statement.close();
-	    		}
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-	    	try {
-	    		if (connection != null)  connection.close();
-	    	} catch (Exception e) {
-	    		logger.log(Level.SEVERE, "Excption in connection !!  " + sql,  e );
-	    	}
-		}   	
+    public void deleteCountry(Country country) {
+	// make sure country you're deleting exists
+	if (isCountryExist2(country)) {
+	    Connection connection = null;
+		PreparedStatement statement = null;
+		String sql = "DELETE FROM country WHERE countryId = ?";
+		try {
+		    connection = super.getConnection();
+		    statement = connection.prepareStatement(sql);
+		    statement.setString(1, country.getCountryId());
+		    statement.executeUpdate();
+		} catch (Exception e) {
+		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+		} finally {
+		    try {
+			if (statement != null) {
+			    statement.close();
+			}
+		    } catch (Exception e) {
+			logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+		    }
+		    try {
+			if (connection != null)
+			    connection.close();
+		    } catch (Exception e) {
+			logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+		    }
+		}    
+	} else {
+	    logger.log(Level.WARNING, "This country does not exists!  ");
 	}
+    }
 	
 	/*
 	 * get all Country List
