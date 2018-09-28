@@ -171,33 +171,36 @@ public class AsianGamesDAO extends DAOUtil {
      * @param country
      */
     public void updateCountry(Country country) {
-	Connection connection = null;
-	PreparedStatement statement = null;
-	String updateString = "UPDATE country  SET countryName = ?, countryFlag = ?  WHERE countryId = ?";
-
-	try {
-	    connection = super.getConnection();
-	    statement = connection.prepareStatement(updateString);
-	    statement.setString(1, country.getCountryName());
-	    statement.setString(2, country.getCountryId());
-	    statement.setBlob(3, country.getCountryFlag());
-	    statement.executeUpdate();
-	} catch (Exception e) {
-	    e.printStackTrace();
-	} finally {
+	if (isCountryExist2(country)) {
+	    Connection connection = null;
+	    PreparedStatement statement = null;
+	    String updateString = "UPDATE country  SET countryName = ?, countryFlag = ?  WHERE countryId = ?";
 	    try {
-		if (statement != null) {
-		    statement.close();
+		connection = super.getConnection();
+		statement = connection.prepareStatement(updateString);
+		statement.setString(1, country.getCountryName());
+		statement.setString(2, country.getCountryId());
+		statement.setBlob(3, country.getCountryFlag());
+		statement.executeUpdate();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    } finally {
+		try {
+		    if (statement != null) {
+			statement.close();
+		    }
+		} catch (Exception e) {
+		    e.printStackTrace();
 		}
-	    } catch (Exception e) {
-		e.printStackTrace();
+		try {
+		    if (connection != null)
+			connection.close();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
 	    }
-	    try {
-		if (connection != null)
-		    connection.close();
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
+	} else {
+	    logger.log(Level.WARNING, "Can't update country that does not exist!");
 	}
     }
 
@@ -340,33 +343,36 @@ public class AsianGamesDAO extends DAOUtil {
      * @param Sport
      */
     public void updateSport(Sport sport) {
-	Connection connection = null;
-	PreparedStatement statement = null;
-	String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
-
-	try {
-	    connection = super.getConnection();
-	    statement = connection.prepareStatement(updateString);
-	    statement.setString(1, sport.getSportName());
-	    statement.setBlob(2, sport.getSportIcon());
-	    statement.setBlob(3, sport.getSportImage());
-	    statement.executeUpdate();
-	} catch (Exception e) {
-	    e.printStackTrace();
-	} finally {
+	if (isSportExist2(sport)) {
+	    Connection connection = null;
+	    PreparedStatement statement = null;
+	    String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
 	    try {
-		if (statement != null) {
-		    statement.close();
+		connection = super.getConnection();
+		statement = connection.prepareStatement(updateString);
+		statement.setString(1, sport.getSportName());
+		statement.setBlob(2, sport.getSportIcon());
+		statement.setBlob(3, sport.getSportImage());
+		statement.executeUpdate();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    } finally {
+		try {
+		    if (statement != null) {
+			statement.close();
+		    }
+		} catch (Exception e) {
+		    e.printStackTrace();
 		}
-	    } catch (Exception e) {
-		e.printStackTrace();
+		try {
+		    if (connection != null)
+			connection.close();
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
 	    }
-	    try {
-		if (connection != null)
-		    connection.close();
-	    } catch (Exception e) {
-		e.printStackTrace();
-	    }
+	} else {
+	    logger.log(Level.WARNING, "Can't update sport that does not exist!");
 	}
     }
 
@@ -684,7 +690,6 @@ public class AsianGamesDAO extends DAOUtil {
 	Connection connection = null;
 	PreparedStatement statement = null;
 	String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
-
 	try {
 	    connection = super.getConnection();
 	    statement = connection.prepareStatement(updateString);
