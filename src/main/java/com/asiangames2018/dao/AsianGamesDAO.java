@@ -102,34 +102,34 @@ public class AsianGamesDAO extends DAOUtil {
      */
     public void deleteCountry(Country country) {
 	// make sure country you're deleting exists
-	if (isCountryExist(country)) {
-	    Connection connection = null;
-	    PreparedStatement statement = null;
-	    String sql = "DELETE FROM country WHERE countryId = ?";
+	if (!isCountryExist(country)) {
+	    logger.log(Level.WARNING, "This country does not exists!", country);
+	    return;
+	}
+	Connection connection = null;
+	PreparedStatement statement = null;
+	String sql = "DELETE FROM country WHERE countryId = ?";
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    statement.setString(1, country.getCountryId());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
 	    try {
-		connection = super.getConnection();
-		statement = connection.prepareStatement(sql);
-		statement.setString(1, country.getCountryId());
-		statement.executeUpdate();
+		if (statement != null) {
+		    statement.close();
+		}
 	    } catch (Exception e) {
 		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-	    } finally {
-		try {
-		    if (statement != null) {
-			statement.close();
-		    }
-		} catch (Exception e) {
-		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-		}
-		try {
-		    if (connection != null)
-			connection.close();
-		} catch (Exception e) {
-		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-		}
 	    }
-	} else {
-	    logger.log(Level.WARNING, "This country does not exists!  ");
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    }
 	}
     }
 
@@ -276,34 +276,34 @@ public class AsianGamesDAO extends DAOUtil {
      * @param sport
      */
     public void deleteSport(Sport sport) {
-	if (isSportExist2(sport)) {
-	    Connection connection = null;
-	    PreparedStatement statement = null;
-	    String sql = "DELETE FROM sport WHERE sportId = ?";
+	if (!isSportExist2(sport)) {
+	    logger.log(Level.WARNING, "This sport does not exists!", sport);
+	    return;
+	}
+	Connection connection = null;
+	PreparedStatement statement = null;
+	String sql = "DELETE FROM sport WHERE sportId = ?";
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    statement.setString(1, sport.getSportId());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
 	    try {
-		connection = super.getConnection();
-		statement = connection.prepareStatement(sql);
-		statement.setString(1, sport.getSportId());
-		statement.executeUpdate();
+		if (statement != null) {
+		    statement.close();
+		}
 	    } catch (Exception e) {
 		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-	    } finally {
-		try {
-		    if (statement != null) {
-			statement.close();
-		    }
-		} catch (Exception e) {
-		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-		}
-		try {
-		    if (connection != null)
-			connection.close();
-		} catch (Exception e) {
-		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-		}
 	    }
-	} else {
-	    logger.log(Level.WARNING, "This sport does not exists!");
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    }
 	}
     }
 
@@ -609,34 +609,34 @@ public class AsianGamesDAO extends DAOUtil {
      * @param Athlete
      */
     public void deleteAthlete(Athlete athlete) {
-	if (isAthleteExist2(athlete)) {
-	    Connection connection = null;
-	    PreparedStatement statement = null;
-	    String sql = "DELETE FROM athlete WHERE athleteId = ?";
+	if (!isAthleteExist2(athlete)) {
+	    logger.log(Level.WARNING, "This athlete does not exists!");
+	    return;
+	}
+	Connection connection = null;
+	PreparedStatement statement = null;
+	String sql = "DELETE FROM athlete WHERE athleteId = ?";
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(sql);
+	    statement.setString(1, athlete.getAthleteId());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	} finally {
 	    try {
-		connection = super.getConnection();
-		statement = connection.prepareStatement(sql);
-		statement.setString(1, athlete.getAthleteId());
-		statement.executeUpdate();
+		if (statement != null) {
+		    statement.close();
+		}
 	    } catch (Exception e) {
 		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-	    } finally {
-		try {
-		    if (statement != null) {
-			statement.close();
-		    }
-		} catch (Exception e) {
-		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-		}
-		try {
-		    if (connection != null)
-			connection.close();
-		} catch (Exception e) {
-		    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
-		}
 	    }
-	} else {
-	    logger.log(Level.WARNING, "This athlete does not exists!");
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
+	    }
 	}
     }
 
