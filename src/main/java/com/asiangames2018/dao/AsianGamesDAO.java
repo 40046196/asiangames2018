@@ -103,7 +103,7 @@ public class AsianGamesDAO extends DAOUtil {
     public void deleteCountry(Country country) {
 	// make sure country you're deleting exists
 	if (!isCountryExist(country)) {
-	    logger.log(Level.WARNING, "This country does not exists!", country);
+	    logger.log(Level.WARNING, "{1} This country does not exists!", country.getCountryId());
 	    return;
 	}
 	Connection connection = null;
@@ -177,40 +177,40 @@ public class AsianGamesDAO extends DAOUtil {
      * @param country
      */
     public void updateCountry(Country country) {
-	if (isCountryExist(country)) {
-	    Connection connection = null;
-	    PreparedStatement statement = null;
-	    String updateString = "UPDATE country  SET countryName = ?, countryFlag = ?  WHERE countryId = ?";
+	if (!isCountryExist(country)) {
+	    logger.log(Level.WARNING, "Can't update country that does not exist!");
+	    return;
+	}
+	Connection connection = null;
+	PreparedStatement statement = null;
+	String updateString = "UPDATE country  SET countryName = ?, countryFlag = ?  WHERE countryId = ?";
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(updateString);
+	    statement.setString(1, country.getCountryName());
+	    if (country.getCountryFlag() == null) {
+		statement.setNull(2, java.sql.Types.BLOB);
+	    } else {
+		statement.setBlob(2, country.getCountryFlag());
+	    }
+	    statement.setString(3, country.getCountryId());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	} finally {
 	    try {
-		connection = super.getConnection();
-		statement = connection.prepareStatement(updateString);
-		statement.setString(1, country.getCountryName());
-		if (country.getCountryFlag() == null) {
-		    statement.setNull(2, java.sql.Types.BLOB);
-		} else {
-		    statement.setBlob(2, country.getCountryFlag());
+		if (statement != null) {
+		    statement.close();
 		}
-		statement.setString(3, country.getCountryId());
-		statement.executeUpdate();
 	    } catch (Exception e) {
 		e.printStackTrace();
-	    } finally {
-		try {
-		    if (statement != null) {
-			statement.close();
-		    }
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-		try {
-		    if (connection != null)
-			connection.close();
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
 	    }
-	} else {
-	    logger.log(Level.WARNING, "Can't update country that does not exist!");
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
 	}
     }
 
@@ -352,36 +352,36 @@ public class AsianGamesDAO extends DAOUtil {
      * @param Sport
      */
     public void updateSport(Sport sport) {
-	if (isSportExist2(sport)) {
-	    Connection connection = null;
-	    PreparedStatement statement = null;
-	    String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
+	if (!isSportExist2(sport)) {
+	    logger.log(Level.WARNING, "Can't update sport that does not exist!");
+	    return;
+	}
+	Connection connection = null;
+	PreparedStatement statement = null;
+	String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
+	try {
+	    connection = super.getConnection();
+	    statement = connection.prepareStatement(updateString);
+	    statement.setString(1, sport.getSportName());
+	    statement.setBlob(2, sport.getSportIcon());
+	    statement.setBlob(3, sport.getSportImage());
+	    statement.executeUpdate();
+	} catch (Exception e) {
+	    e.printStackTrace();
+	} finally {
 	    try {
-		connection = super.getConnection();
-		statement = connection.prepareStatement(updateString);
-		statement.setString(1, sport.getSportName());
-		statement.setBlob(2, sport.getSportIcon());
-		statement.setBlob(3, sport.getSportImage());
-		statement.executeUpdate();
+		if (statement != null) {
+		    statement.close();
+		}
 	    } catch (Exception e) {
 		e.printStackTrace();
-	    } finally {
-		try {
-		    if (statement != null) {
-			statement.close();
-		    }
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-		try {
-		    if (connection != null)
-			connection.close();
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
 	    }
-	} else {
-	    logger.log(Level.WARNING, "Can't update sport that does not exist!");
+	    try {
+		if (connection != null)
+		    connection.close();
+	    } catch (Exception e) {
+		e.printStackTrace();
+	    }
 	}
     }
 
