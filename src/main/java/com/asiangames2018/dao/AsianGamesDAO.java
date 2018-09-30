@@ -258,11 +258,12 @@ public class AsianGamesDAO extends DAOUtil {
      * @param sportToFind
      * @return
      */
-    public boolean isSportExist2(Sport sportToFind) {
+    public boolean isSportExist(Sport sportToFind) {
 	Collection<Sport> sportCollection = listAllSports();
 	boolean condition = false;
-	for (int i = 0; i < sportCollection.size(); i++) {
-	    if (sportCollection.contains(sportToFind)) {
+	for (Iterator<Sport> i = sportCollection.iterator(); i.hasNext();) {
+	    Sport s = i.next();
+	    if (sportToFind.getSportId().equals(s.getSportId())) {
 		condition = true;
 		break;
 	    }
@@ -276,7 +277,7 @@ public class AsianGamesDAO extends DAOUtil {
      * @param sport
      */
     public void deleteSport(Sport sport) {
-	if (!isSportExist2(sport)) {
+	if (!isSportExist(sport)) {
 	    logger.log(Level.WARNING, "This sport does not exists!", sport);
 	    return;
 	}
@@ -352,7 +353,7 @@ public class AsianGamesDAO extends DAOUtil {
      * @param Sport
      */
     public void updateSport(Sport sport) {
-	if (!isSportExist2(sport)) {
+	if (!isSportExist(sport)) {
 	    logger.log(Level.WARNING, "Can't update sport that does not exist!");
 	    return;
 	}
@@ -591,11 +592,12 @@ public class AsianGamesDAO extends DAOUtil {
      * @param athleteToFind
      * @return
      */
-    public boolean isAthleteExist2(Athlete athleteToFind) {
+    public boolean isAthleteExist(Athlete athleteToFind) {
 	Collection<Athlete> athleteCollection = listAllAthletes();
 	boolean condition = false;
-	for (int i = 0; i < athleteCollection.size(); i++) {
-	    if (athleteCollection.contains(athleteToFind)) {
+	for(Iterator<Athlete> i = athleteCollection.iterator(); i.hasNext();) {
+	    Athlete a = i.next();
+	    if (athleteToFind.getAthleteId().equals(a.getAthleteId())) {
 		condition = true;
 		break;
 	    }
@@ -609,7 +611,7 @@ public class AsianGamesDAO extends DAOUtil {
      * @param Athlete
      */
     public void deleteAthlete(Athlete athlete) {
-	if (!isAthleteExist2(athlete)) {
+	if (!isAthleteExist(athlete)) {
 	    logger.log(Level.WARNING, "This athlete does not exists!");
 	    return;
 	}
