@@ -7,12 +7,20 @@ import java.util.Iterator;
 import org.junit.Test;
 
 import com.asiangames2018.dao.AsianGamesDAO;
+import com.asiangames2018.entity.Country;
+import com.asiangames2018.entity.Sport;
 
 public class TestSportDAO {
 
     @Test
     public void testListAllSports() {
-	// TODO
+	AsianGamesDAO dao = new AsianGamesDAO();
+	Collection<Sport> sports = dao.listAllSports();
+	assertNotNull(sports.size());
+	for (Iterator<Sport> i = sports.iterator(); i.hasNext();) {
+	    Sport s = i.next();
+	    System.out.println(s.getSportId());
+	}
     }
     
     @Test
