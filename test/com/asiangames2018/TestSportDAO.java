@@ -31,7 +31,14 @@ public class TestSportDAO {
     
     @Test
     public void testDeleteSport() {
-	// TODO
+	AsianGamesDAO dao = new AsianGamesDAO();
+	Sport s = new Sport("AF", "American Football");
+	if (dao.isSportExist(s)) {
+	    dao.deleteSport(s);
+	    assertFalse(dao.isSportExist(s));
+	}
+	dao.insertSport(s);
+	assertTrue(dao.isSportExist(s));
     }
     
     @Test

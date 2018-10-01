@@ -47,9 +47,8 @@ public class AsianGamesDAO extends DAOUtil {
 	    statement.setString(2, country.getCountryName());
 	    if (country.getCountryFlag() != null) {
 		statement.setBlob(3, country.getCountryFlag());
-	    } else {
-		statement.setNull(3, java.sql.Types.BLOB);
 	    }
+	    statement.setNull(3, java.sql.Types.BLOB);
 	    statement.executeUpdate();
 	} catch (Exception e) {
 	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
@@ -83,7 +82,7 @@ public class AsianGamesDAO extends DAOUtil {
      */
     public boolean isCountryExist(Country countryToSearch) {
 	Collection<Country> countryCollection = listAllCountries();
-	boolean condition = false; 
+	boolean condition = false;
 	for (Iterator<Country> i = countryCollection.iterator(); i.hasNext();) {
 	    Country c = i.next();
 	    String countryToFindID = countryToSearch.getCountryId();
@@ -223,15 +222,20 @@ public class AsianGamesDAO extends DAOUtil {
     public void insertSport(Sport sport) {
 	Connection connection = null;
 	PreparedStatement statement = null;
-
 	String sql = "Insert IGNORE into sport(sportId, sportName, sportIcon, sportImage) values(?,?,?,?)";
 	try {
 	    connection = super.getConnection();
 	    statement = connection.prepareStatement(sql);
 	    statement.setString(1, sport.getSportId());
 	    statement.setString(2, sport.getSportName());
-	    statement.setBlob(3, sport.getSportIcon());
-	    statement.setBlob(4, sport.getSportImage());
+	    if (sport.getSportIcon() != null) {
+		statement.setBlob(3, sport.getSportIcon());
+	    }
+	    statement.setNull(3, java.sql.Types.BLOB);
+	    if (sport.getSportImage() != null) {
+		statement.setBlob(4, sport.getSportImage());
+	    }
+	    statement.setNull(4, java.sql.Types.BLOB);
 	    statement.executeUpdate();
 	} catch (Exception e) {
 	    logger.log(Level.SEVERE, "Excption in connection !!  " + sql, e);
@@ -597,7 +601,7 @@ public class AsianGamesDAO extends DAOUtil {
     public boolean isAthleteExist(Athlete athleteToFind) {
 	Collection<Athlete> athleteCollection = listAllAthletes();
 	boolean condition = false;
-	for(Iterator<Athlete> i = athleteCollection.iterator(); i.hasNext();) {
+	for (Iterator<Athlete> i = athleteCollection.iterator(); i.hasNext();) {
 	    Athlete a = i.next();
 	    if (athleteToFind.getAthleteId().equals(a.getAthleteId())) {
 		condition = true;
