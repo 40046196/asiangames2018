@@ -42,104 +42,115 @@ import com.jaunt.UserAgent;
 import com.jaunt.util.IOUtil;
 
 /**
- * Hello world!
- * https://en.asiangames2018.id/d3images/ml/flags/xl/JPN.png
+ * Hello world! https://en.asiangames2018.id/d3images/ml/flags/xl/JPN.png
  *
  */
-public class App 
-{
-	public static void main(String[] args) {
-		try {
-			GeneralLogging.setup();   // setup the logger file, only call once.
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		//	 UIManager.getDefaults().put( "TitledBorder.font", new javax.swing.plaf.FontUIResource( new Font( "Arial", Font.BOLD, 12 ) ) ) ;
-
-       SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                Font f = new Font("verdana", Font.BOLD, 18);
-                UIManager.put("Menu.font", f);
-                UIManager.put("MenuItem.font", f);
-                UIManager.put("TitledBorder.font", f);
-	                
-                createGUIMenu();
-            }
-        });		
+public class App {
+    public static void main(String[] args) {
+	try {
+	    GeneralLogging.setup(); // setup the logger file, only call once.
+	} catch (Exception ex) {
+	    ex.printStackTrace();
 	}
-	
-	
-	/*
-	 * Create and setup the Frame Windows GUI
-	 */
-	protected static  void createGUIMenu() {
-		mainFrame.setTitle("Asian Games 2018 Statistics - (c) 2018, Lion du Quebec" ); // Prepare a blank frame  
-		javax.swing.JPanel panel = new ImagePanel();
-		mainFrame.add(panel);
-		App app = new App();  
-		mainFrame.setJMenuBar(app.createMenu());  //  set the menu for this application
+	// UIManager.getDefaults().put( "TitledBorder.font", new
+	// javax.swing.plaf.FontUIResource( new Font( "Arial", Font.BOLD, 12 ) )
+	// ) ;
 
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();   //  get the default windows size
-		mainFrame.setSize(screenSize.width, screenSize.height);     // Initialize the frame size (width * height);   (x,y) position..
-        Dimension frameSize = mainFrame.getSize();  //  get your frame size as your screen size
-		mainFrame.setVisible(true);
-		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	}
-	
-	/**
-	 * Set up the menu bar, on the top of the frame..
-	 */
-	public JMenuBar createMenu() {
-		JMenuBar menuBar = new JMenuBar();  // the bar to handle all menus.
-		setFileMenu(menuBar);
-		return menuBar;
-	}	
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+		Font f = new Font("verdana", Font.BOLD, 18);
+		UIManager.put("Menu.font", f);
+		UIManager.put("MenuItem.font", f);
+		UIManager.put("TitledBorder.font", f);
 
-	/**
-	 * Display all action under File Menus
-	 * @param menuBar
-	 */
-	private void setFileMenu(JMenuBar menuBar) {
-		// Define the first Menu for Download and Update database tables.
-		JMenu fileMenu = new JMenu("File");   //  First group will handle master file
-		fileMenu.setMnemonic(KeyEvent.VK_F);  //  The shortcut is ALT + F (Master File)	
-		menuBar.add(fileMenu);   //  add to the menu bar
-			/**  The Menu Under File  **/
-		JMenuItem downloadAsianGamesBasicData = new JMenuItem("Download Basic Data", KeyEvent.VK_D);
-		downloadAsianGamesBasicData.setToolTipText("Download Basic Data: Country, Sport, Athletes");
-		downloadAsianGamesBasicData.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				downloadAsianGamesBasicDataItemActionPerformed(evt);
-			}
-		});		
-		fileMenu.add(downloadAsianGamesBasicData);     
-	}	
-	
-	/**
-	 * download all master tables from asian games websites
-	 * @param evt
-	 */
-	private void downloadAsianGamesBasicDataItemActionPerformed (ActionEvent evt) {
-		DownloadAsianGamesInfo downloadAsianGamesInfo = new DownloadAsianGamesInfo();		
-		JDialog dialog = new JDialog(mainFrame ,"Download Asian Games Basic Info", true);  // mainFrame is the modal,
+		createGUIMenu();
+	    }
+	});
+    }
 
-		dialog.add(downloadAsianGamesInfo);
-		dialog.pack();
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();   //  get the default windows size
-        Dimension dialogSize = dialog.getSize();  //  get your frame size
-        dialog.setLocation(new Point((screenSize.width  - dialogSize.width) / 2,                        // set the position of the frame
-               (screenSize.height - dialogSize.height) / 2));                      // to the center of screen
-		dialog.setDefaultCloseOperation( javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-		JDialogHelper.setJDialogTree(dialog,  null, null);   //  Dialog student form is first dialog
-		dialog.setVisible(true);  // When setVisible  this program waiting, until you close the dialog.
-		dialog.dispose();
-	}
+    /*
+     * Create and setup the Frame Windows GUI
+     */
+    protected static void createGUIMenu() {
+	// Prepare a blank frame
+	mainFrame.setTitle("Asian Games 2018 Statistics - (c) 2018, Lion du Quebec");
+	javax.swing.JPanel panel = new ImagePanel();
+	mainFrame.add(panel);
+	App app = new App();
+	// set the menu for this application
+	mainFrame.setJMenuBar(app.createMenu()); 
+	// get the default windows size
+	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
+	// Initialize the frame size (width * height); (x,y) position..
+	mainFrame.setSize(screenSize.width, screenSize.height);
+	Dimension frameSize = mainFrame.getSize(); // get your frame size as
+						   // your screen size
+	mainFrame.setVisible(true);
+	mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
 
+    /**
+     * Set up the menu bar, on the top of the frame..
+     */
+    public JMenuBar createMenu() {
+	JMenuBar menuBar = new JMenuBar(); // the bar to handle all menus.
+	setFileMenu(menuBar);
+	return menuBar;
+    }
 
-   // Variables declaration - do not modify
-	private static BufferedImage image;
-	private static  JFrame mainFrame = new JFrame();
-	protected JDialog parentDialog;
+    /**
+     * Display all action under File Menus
+     * 
+     * @param menuBar
+     */
+    private void setFileMenu(JMenuBar menuBar) {
+	// Define the first Menu for Download and Update database tables.
+	JMenu fileMenu = new JMenu("File"); // First group will handle master
+					    // file
+	fileMenu.setMnemonic(KeyEvent.VK_F); // The shortcut is ALT + F (Master
+					     // File)
+	menuBar.add(fileMenu); // add to the menu bar
+	/** The Menu Under File **/
+	JMenuItem downloadAsianGamesBasicData = new JMenuItem("Download Basic Data", KeyEvent.VK_D);
+	downloadAsianGamesBasicData.setToolTipText("Download Basic Data: Country, Sport, Athletes");
+	downloadAsianGamesBasicData.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent evt) {
+		downloadAsianGamesBasicDataItemActionPerformed(evt);
+	    }
+	});
+	fileMenu.add(downloadAsianGamesBasicData);
+    }
 
+    /**
+     * download all master tables from asian games websites
+     * 
+     * @param evt
+     */
+    private void downloadAsianGamesBasicDataItemActionPerformed(ActionEvent evt) {
+	DownloadAsianGamesInfo downloadAsianGamesInfo = new DownloadAsianGamesInfo();
+	// mainFrame is the modal,
+	JDialog dialog = new JDialog(mainFrame, "Download Asian Games Basic Info", true); 
+
+	dialog.add(downloadAsianGamesInfo);
+	dialog.pack();
+	// get the default windows size
+	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize(); 
+	Dimension dialogSize = dialog.getSize(); // get your frame size
+	// set the position of the frame
+	dialog.setLocation(new Point((screenSize.width - dialogSize.width) / 2, 
+		(screenSize.height - dialogSize.height) / 2)); // to the center
+							       // of screen
+	dialog.setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+	JDialogHelper.setJDialogTree(dialog, null, null); // Dialog student form
+							  // is first dialog
+	dialog.setVisible(true); // When setVisible this program waiting, until
+				 // you close the dialog.
+	dialog.dispose();
+    }
+
+    // Variables declaration - do not modify
+    private static BufferedImage image;
+    private static JFrame mainFrame = new JFrame();
+    protected JDialog parentDialog;
 
 }
