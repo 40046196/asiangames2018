@@ -258,12 +258,14 @@ public class AsianGamesDAO extends DAOUtil {
      * @param sportToFind
      * @return
      */
-    public boolean isSportExist(Sport sportToFind) {
+    public boolean isSportExist(Sport sToFind) {
 	Collection<Sport> sportCollection = listAllSports();
 	boolean condition = false;
 	for (Iterator<Sport> i = sportCollection.iterator(); i.hasNext();) {
 	    Sport s = i.next();
-	    if (sportToFind.getSportId().equals(s.getSportId())) {
+	    String sId = s.getSportId();
+	    String sName = s.getSportName();
+	    if (sToFind.getSportId().equals(sId) && sToFind.getSportName().equals(sName)) {
 		condition = true;
 		break;
 	    }

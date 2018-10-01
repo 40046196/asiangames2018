@@ -7,7 +7,6 @@ import java.util.Iterator;
 import org.junit.Test;
 
 import com.asiangames2018.dao.AsianGamesDAO;
-import com.asiangames2018.entity.Country;
 import com.asiangames2018.entity.Sport;
 
 public class TestSportDAO {
@@ -25,7 +24,9 @@ public class TestSportDAO {
     
     @Test
     public void testIsSportExist() {
-	// TODO
+	AsianGamesDAO dao = new AsianGamesDAO();
+	assertTrue(dao.isSportExist(new Sport("BK", "Basketball")));
+	assertFalse(dao.isSportExist(new Sport("AF", "American Football")));
     }
     
     @Test
