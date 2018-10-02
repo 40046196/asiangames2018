@@ -365,13 +365,14 @@ public class AsianGamesDAO extends DAOUtil {
 	}
 	Connection connection = null;
 	PreparedStatement statement = null;
-	String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE countryId = ?";
+	String updateString = "UPDATE sport  SET sportName = ?, sportIcon = ?, sportImage=?  WHERE sportId = ?";
 	try {
 	    connection = super.getConnection();
 	    statement = connection.prepareStatement(updateString);
 	    statement.setString(1, sport.getSportName());
 	    statement.setBlob(2, sport.getSportIcon());
 	    statement.setBlob(3, sport.getSportImage());
+	    statement.setString(4, sport.getSportId());
 	    statement.executeUpdate();
 	} catch (Exception e) {
 	    e.printStackTrace();

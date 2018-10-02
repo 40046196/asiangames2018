@@ -45,10 +45,23 @@ public class TestCountryDAO {
     @Test
     public void testUpdateCountry() {
 	AsianGamesDAO dao = new AsianGamesDAO();
-	// from Canada -> Canadas
-	Country can = new Country("CAN", "Canadas");
-	dao.updateCountry(can);
-	assertTrue(dao.isCountryExist(can));
+	String countryId = "CAN";
+	String newCountryName = "Canadas";
+	Country can = new Country(countryId, newCountryName);
+	if (dao.isCountryExist(can)) {
+	    dao.updateCountry(can);
+	}
+	dao.insertCountry(can);
+	String countryName = "";
+	Collection<Country> countries = dao.listAllCountries();
+	for (Iterator<Country> i = countries.iterator(); i.hasNext();) {
+	    Country c = i.next();
+	    if (c.getCountryId().equals(countryId)) {
+		countryName = c.getCountryName();
+		break;
+	    }
+	}
+	assertEquals(countryName, newCountryName);
     }
 
     @Test

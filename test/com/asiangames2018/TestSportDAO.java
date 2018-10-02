@@ -29,6 +29,10 @@ public class TestSportDAO {
 	assertFalse(dao.isSportExist(new Sport("AF", "American Football")));
     }
     
+    public void testInsertSport() {
+	// TODO
+    }
+    
     @Test
     public void testDeleteSport() {
 	AsianGamesDAO dao = new AsianGamesDAO();
@@ -43,7 +47,24 @@ public class TestSportDAO {
     
     @Test
     public void testUpdateSport() {
-	// TODO
+	AsianGamesDAO dao = new AsianGamesDAO();
+	String sportId = "AF";
+	String newSportName = "Football";
+	Sport nfl = new Sport(sportId, newSportName);
+	if (dao.isSportExist(nfl)) {
+	    dao.updateSport(nfl);
+	}
+	dao.insertSport(nfl);
+	String sportName = "";
+	Collection<Sport> sports = dao.listAllSports();
+	for (Iterator<Sport> i = sports.iterator(); i.hasNext();) {
+	    Sport s = i.next();
+	    if (s.getSportId().equals(sportId)) {
+		sportName = s.getSportName();
+		break;
+	    }
+	}
+	assertEquals(newSportName, sportName);
     }
     
 }
