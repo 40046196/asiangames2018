@@ -29,8 +29,15 @@ public class TestSportDAO {
 	assertFalse(dao.isSportExist(new Sport("AF", "American Football")));
     }
 
+    @Test
     public void testInsertSport() {
-	// TODO
+	AsianGamesDAO dao = new AsianGamesDAO();
+	Sport nfl = new Sport("AF", "American Football");
+	if (!dao.isSportExist(nfl)) {
+	    dao.insertSport(nfl);
+	}
+	assertTrue(dao.isSportExist(nfl));
+	System.out.println(nfl.toString() + " inserted!");
     }
 
     @Test
