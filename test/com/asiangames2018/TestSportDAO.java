@@ -21,18 +21,18 @@ public class TestSportDAO {
 	    System.out.println(s.getSportId());
 	}
     }
-    
+
     @Test
     public void testIsSportExist() {
 	AsianGamesDAO dao = new AsianGamesDAO();
 	assertTrue(dao.isSportExist(new Sport("BK", "Basketball")));
 	assertFalse(dao.isSportExist(new Sport("AF", "American Football")));
     }
-    
+
     public void testInsertSport() {
 	// TODO
     }
-    
+
     @Test
     public void testDeleteSport() {
 	AsianGamesDAO dao = new AsianGamesDAO();
@@ -44,7 +44,7 @@ public class TestSportDAO {
 	dao.insertSport(s);
 	assertTrue(dao.isSportExist(s));
     }
-    
+
     @Test
     public void testUpdateSport() {
 	AsianGamesDAO dao = new AsianGamesDAO();
@@ -66,5 +66,5 @@ public class TestSportDAO {
 	}
 	assertEquals(newSportName, sportName);
     }
-    
+
 }

@@ -268,8 +268,7 @@ public class AsianGamesDAO extends DAOUtil {
 	for (Iterator<Sport> i = sportCollection.iterator(); i.hasNext();) {
 	    Sport s = i.next();
 	    String sId = s.getSportId();
-	    String sName = s.getSportName();
-	    if (sToFind.getSportId().equals(sId) && sToFind.getSportName().equals(sName)) {
+	    if (sToFind.getSportId().equals(sId)) {
 		condition = true;
 		break;
 	    }
